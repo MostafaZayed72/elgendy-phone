@@ -2,9 +2,16 @@
 import { Phone, PhoneCall, Copy, Check, Clock, Truck } from 'lucide-vue-next'
 import { elgendyStore } from '~/data/elgendy-store'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const colorMode = useColorMode()
 const { showToast } = useToast()
+
+const zaydexWhatsappUrl = computed(() => {
+  const msg = locale.value === 'ar'
+    ? 'مرحباً، أريد الاستفسار عن إنشاء متجر / كتالوج مثل متجر الجندي للموبايلات عبر منصة Zaydex'
+    : 'Hello, I want to inquire about creating a catalog store like EL-GENDY Mobile Store on Zaydex'
+  return `https://wa.me/201099658770?text=${encodeURIComponent(msg)}`
+})
 
 const mounted = ref(false)
 const copiedId = ref<string | null>(null)
@@ -136,15 +143,36 @@ const getBadgeLabel = (type: 'whatsapp' | 'mobile' | 'landline') => {
         </div>
       </div>
 
-      <!-- Bottom Bar -->
-      <div class="pt-6 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-        <p>© {{ currentYear }} {{ t('footer.rights') }}</p>
-        <div class="flex items-center gap-4">
+      <!-- Bottom Bar + Powered by Zaydex -->
+      <div class="pt-6 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+          <p>© {{ currentYear }} {{ t('footer.rights') }}</p>
+          <span class="text-slate-300 dark:text-slate-700">|</span>
           <NuxtLink to="/admin" class="hover:text-brand-500 transition-colors font-bold">
             لوحة التحكم
           </NuxtLink>
-          <p class="font-bold text-brand-500 dark:text-brand-400">EL-GENDY Mobile Store — Since 1999</p>
         </div>
+
+        <a
+          :href="`https://wa.me/201099658770?text=${encodeURIComponent('مرحباً، أريد الاستفسار عن إنشاء متجر / كتالوج مثل متجر الجندي للموبايلات عبر منصة Zaydex')}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/80 dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 transition-all shadow-xs hover:shadow-sm"
+          dir="ltr"
+        >
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">Powered by</span>
+          <img
+            src="/images/zaydex/logo.png"
+            alt="Zaydex"
+            class="h-5 w-auto object-contain dark:hidden group-hover:scale-105 transition-transform"
+          />
+          <img
+            src="/images/zaydex/logo-dark.png"
+            alt="Zaydex"
+            class="h-5 w-auto object-contain hidden dark:block group-hover:scale-105 transition-transform"
+          />
+          <span class="text-xs font-black text-slate-800 dark:text-white tracking-tight">Zaydex</span>
+        </a>
       </div>
     </div>
   </footer>
