@@ -1,0 +1,25 @@
+{
+  "name": "EL-GENDY Mobile Store | متجر الجندي للموبايلات",
+  "short_name": "EL-GENDY",
+  "description": "متجر الجندي للموبايلات منذ 1999 — أحدث الهواتف الذكية والإكسسوارات الأصلية",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#1e6bb8",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

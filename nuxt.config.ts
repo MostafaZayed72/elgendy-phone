@@ -79,10 +79,20 @@ export default defineNuxtConfig({
     head: {
       meta: [
         { name: 'theme-color', content: '#1e6bb8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' }
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' }
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/images/logo.png' }
+        { rel: 'icon', type: 'image/png', href: '/images/logo.png' },
+        { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
+        { rel: 'manifest', href: '/manifest.webmanifest' }
+      ],
+      script: [
+        {
+          innerHTML: "window.__pwaInstallPrompt=null;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwaInstallPrompt=e;window.dispatchEvent(new Event('pwa-prompt-ready'));});",
+          type: 'text/javascript'
+        }
       ]
     }
   }
