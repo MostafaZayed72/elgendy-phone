@@ -53,7 +53,7 @@ const getCategoryIcon = (icon: string) => {
     <LatestProductsMarquee :products="latestProducts" @select="selectedProduct = $event" />
 
     <!-- Main Catalog Section -->
-    <main id="catalog-section" class="flex-1 max-w-6xl w-full mx-auto px-4 py-10 sm:py-14 space-y-8">
+    <main id="catalog-section" class="flex-1 w-full px-4 sm:px-6 lg:px-10 py-10 sm:py-14 space-y-8">
       <!-- Section Header + Search -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4" data-aos="fade-up">
         <div>
@@ -109,7 +109,7 @@ const getCategoryIcon = (icon: string) => {
       <!-- Products Grid -->
       <div
         v-if="filteredProducts.length > 0"
-        class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5"
       >
         <ProductCard
           v-for="(product, idx) in filteredProducts"

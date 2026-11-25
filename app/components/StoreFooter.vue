@@ -41,7 +41,7 @@ const getBadgeLabel = (type: 'whatsapp' | 'mobile' | 'landline') => {
 
 <template>
   <footer class="mt-20 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md pt-12 pb-8 transition-colors">
-    <div class="max-w-6xl mx-auto px-4 space-y-10">
+    <div class="w-full px-4 sm:px-6 lg:px-10 space-y-10">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
         <!-- Brand Column -->
         <div class="space-y-4">

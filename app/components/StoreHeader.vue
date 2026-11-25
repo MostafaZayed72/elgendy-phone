@@ -34,7 +34,7 @@ const activeLogo = computed(() => {
 
 <template>
   <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors shadow-sm">
-    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+    <div class="w-full px-4 sm:px-6 lg:px-10 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
       <!-- Store Logo -->
       <button
         type="button"

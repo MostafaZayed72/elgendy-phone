@@ -39,7 +39,7 @@ const animationDuration = computed(() => {
     class="w-full py-4 sm:py-5 bg-white/80 dark:bg-slate-900/60 border-b border-slate-200/70 dark:border-slate-800/70 overflow-hidden"
   >
     <!-- Marquee Header -->
-    <div class="max-w-6xl mx-auto px-3 sm:px-4 mb-3 flex items-center justify-between gap-2">
+    <div class="w-full px-4 sm:px-6 lg:px-10 mb-3 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2">
         <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl bg-brand-500 text-white shadow-xs">
           <Flame class="w-4 h-4" />
