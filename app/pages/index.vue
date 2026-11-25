@@ -10,6 +10,8 @@ const activeCategory = ref<string>('all')
 const searchQuery = ref<string>('')
 const selectedProduct = ref<Product | null>(null)
 
+const latestProducts = computed(() => storeProducts.slice(0, 10))
+
 useSeoMeta({
   title: () => t('store.catalogTitle'),
   description: () => t('store.tagline'),
@@ -47,7 +49,8 @@ const getCategoryIcon = (icon: string) => {
 <template>
   <div class="flex flex-col min-h-screen">
     <StoreHeader />
-    <StoreHero />
+    <StoreHero :carousel-products="latestProducts" @select="selectedProduct = $event" />
+    <LatestProductsMarquee :products="latestProducts" @select="selectedProduct = $event" />
 
     <!-- Main Catalog Section -->
     <main id="catalog-section" class="flex-1 max-w-6xl w-full mx-auto px-4 py-10 sm:py-14 space-y-8">
