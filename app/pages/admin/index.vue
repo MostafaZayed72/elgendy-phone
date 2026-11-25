@@ -444,9 +444,9 @@ const seedDatabase = async () => {
           </div>
         </div>
 
-        <!-- Seed Alert if Supabase connected and default products aren't all imported yet -->
+        <!-- Seed Alert if Supabase connected but still showing local fallback -->
         <div
-          v-if="supabaseConnected && (storeSource === 'local' || products.length < 15)"
+          v-if="supabaseConnected && storeSource === 'local'"
           class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
         >
           <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-300">
