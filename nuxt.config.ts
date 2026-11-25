@@ -56,6 +56,25 @@ export default defineNuxtConfig({
     }
   },
 
+  runtimeConfig: {
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
+    adminUsername: process.env.ADMIN_USERNAME || 'elgendy',
+    adminPassword: process.env.ADMIN_PASSWORD || '123456',
+    maxImagesLimit: Number(process.env.MAX_IMAGES_LIMIT || 250),
+    public: {
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL || '',
+      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    }
+  },
+
+  routeRules: {
+    '/api/**': { cache: false },
+    '/admin/**': { ssr: false, cache: false }
+  },
+
   app: {
     head: {
       meta: [

@@ -30,6 +30,7 @@ export interface Product {
   badge?: LocalizedText
   colors?: string[]
   options?: string[]
+  isHidden?: boolean
   isOutOfStock?: boolean
   featured?: boolean
 }

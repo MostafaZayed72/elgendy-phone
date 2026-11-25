@@ -139,7 +139,12 @@ const getBadgeLabel = (type: 'whatsapp' | 'mobile' | 'landline') => {
       <!-- Bottom Bar -->
       <div class="pt-6 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
         <p>© {{ currentYear }} {{ t('footer.rights') }}</p>
-        <p class="font-bold text-brand-500 dark:text-brand-400">EL-GENDY Mobile Store — Since 1999</p>
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/admin" class="hover:text-brand-500 transition-colors font-bold">
+            لوحة التحكم
+          </NuxtLink>
+          <p class="font-bold text-brand-500 dark:text-brand-400">EL-GENDY Mobile Store — Since 1999</p>
+        </div>
       </div>
     </div>
   </footer>

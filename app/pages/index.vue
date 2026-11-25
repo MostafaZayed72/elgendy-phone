@@ -6,11 +6,22 @@ import type { Product } from '~/types/store'
 const { locale, t } = useI18n()
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'ar'))
 
+const { data: storeData } = await useFetch('/api/store', {
+  default: () => ({
+    source: 'local',
+    categories: storeCategories,
+    products: storeProducts
+  })
+})
+
+const categories = computed(() => storeData.value?.categories || storeCategories)
+const products = computed(() => storeData.value?.products || storeProducts)
+
 const activeCategory = ref<string>('all')
 const searchQuery = ref<string>('')
 const selectedProduct = ref<Product | null>(null)
 
-const latestProducts = computed(() => storeProducts.slice(0, 10))
+const latestProducts = computed(() => products.value.slice(0, 10))
 
 useSeoMeta({
   title: () => t('store.catalogTitle'),
@@ -23,7 +34,7 @@ useSeoMeta({
 
 const filteredProducts = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
-  return storeProducts.filter((product) => {
+  return products.value.filter((product) => {
     const matchesCategory = activeCategory.value === 'all' || product.categorySlug === activeCategory.value
     if (!matchesCategory) return false
     if (!q) return true
@@ -92,7 +103,7 @@ const getCategoryIcon = (icon: string) => {
         </button>
 
         <button
-          v-for="cat in storeCategories"
+          v-for="cat in categories"
           :key="cat.id"
           type="button"
           @click="activeCategory = cat.slug"
