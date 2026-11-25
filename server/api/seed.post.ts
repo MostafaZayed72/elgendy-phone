@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     sort_order: idx
   }))
 
-  const { error: catErr } = await supabase.from('categories').upsert(catPayloads)
+  const { error: catErr } = await supabase.from('categories').upsert(catPayloads, { onConflict: 'id', ignoreDuplicates: true })
   if (catErr) {
     throw createError({ statusCode: 500, statusMessage: catErr.message })
   }
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     sort_order: idx
   }))
 
-  const { error: prodErr } = await supabase.from('products').upsert(prodPayloads)
+  const { error: prodErr } = await supabase.from('products').upsert(prodPayloads, { onConflict: 'id', ignoreDuplicates: true })
   if (prodErr) {
     throw createError({ statusCode: 500, statusMessage: prodErr.message })
   }

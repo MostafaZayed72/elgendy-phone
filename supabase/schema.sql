@@ -60,3 +60,8 @@ CREATE POLICY "Allow all write categories" ON public.categories FOR ALL USING (t
 
 DROP POLICY IF EXISTS "Allow all write products" ON public.products;
 CREATE POLICY "Allow all write products" ON public.products FOR ALL USING (true) WITH CHECK (true);
+
+-- منح صلاحيات الوصول الكاملة للجداول في قاعدة البيانات
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.categories TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.products TO anon, authenticated, service_role;

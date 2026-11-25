@@ -444,14 +444,14 @@ const seedDatabase = async () => {
           </div>
         </div>
 
-        <!-- Seed Alert if Supabase connected but still showing local fallback -->
+        <!-- Seed Alert if Supabase connected and default products aren't all imported yet -->
         <div
-          v-if="supabaseConnected && storeSource === 'local'"
+          v-if="supabaseConnected && (storeSource === 'local' || products.length < 15)"
           class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
         >
           <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-amber-700 dark:text-amber-300">
             <AlertTriangle class="w-5 h-5 shrink-0" />
-            <span>قاعدة البيانات متصلة وفارغة حالياً. اضغط لاستيراد المنتجات الافتراضية إليها لتتمكن من تعديلها وحذفها.</span>
+            <span>اضغط لاستيراد باقي المنتجات الافتراضية إلى قاعدة البيانات (دون المساس بتعديلاتك الحالية).</span>
           </div>
           <button
             type="button"
