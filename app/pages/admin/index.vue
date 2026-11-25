@@ -178,7 +178,7 @@ const handleImageUpload = async (event: Event) => {
     })
     if (res.url) {
       formProduct.image = res.url
-      showToast('تم رفع الصورة بنجاح إلى كلاودينري')
+      showToast('تم رفع الصورة بنجاح')
     }
   } catch (err: any) {
     showToast(err?.data?.statusMessage || err?.statusMessage || 'فشل رفع الصورة', 'info', 4000)
@@ -399,8 +399,8 @@ const seedDatabase = async () => {
       </header>
 
       <main class="w-full px-4 sm:px-8 py-6 space-y-6">
-        <!-- Connection & Quota Banner -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Quota & Stats Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Products Stat -->
           <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
             <div class="w-11 h-11 rounded-xl bg-brand-500/10 text-brand-500 flex items-center justify-center shrink-0">
@@ -440,22 +440,6 @@ const seedDatabase = async () => {
                 :class="imageCount >= maxImages ? 'bg-rose-500' : 'bg-brand-500'"
                 :style="{ width: `${quotaPercent}%` }"
               />
-            </div>
-          </div>
-
-          <!-- Services Status -->
-          <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 text-xs font-bold">
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><Database class="w-4 h-4 text-emerald-500" /> سوبابيز</span>
-              <span :class="supabaseConnected ? 'text-emerald-500' : 'text-amber-500'">
-                {{ supabaseConnected ? 'متصل' : 'غير مهيأ في .env' }}
-              </span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><Cloud class="w-4 h-4 text-sky-500" /> كلاودينري</span>
-              <span :class="cloudinaryConnected ? 'text-emerald-500' : 'text-amber-500'">
-                {{ cloudinaryConnected ? 'متصل' : 'غير مهيأ في .env' }}
-              </span>
             </div>
           </div>
         </div>
@@ -635,7 +619,7 @@ const seedDatabase = async () => {
                 <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-extrabold cursor-pointer">
                   <Loader2 v-if="uploadingImage" class="w-4 h-4 animate-spin" />
                   <Upload v-else class="w-4 h-4" />
-                  <span>{{ uploadingImage ? 'جاري الرفع إلى كلاودينري...' : 'رفع صورة من جهازك (كلاودينري)' }}</span>
+                  <span>{{ uploadingImage ? 'جاري رفع الصورة...' : 'رفع صورة من جهازك' }}</span>
                   <input type="file" accept="image/*" class="hidden" @change="handleImageUpload" :disabled="uploadingImage" />
                 </label>
                 <input
