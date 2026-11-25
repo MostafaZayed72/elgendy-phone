@@ -1,0 +1,12 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'>
+  <defs><linearGradient id='g2' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#0f172a' stop-opacity='.12'/><stop offset='100%' stop-color='#1e6bb8' stop-opacity='.14'/></linearGradient></defs>
+  <rect width='400' height='400' rx='32' fill='url(#g2)'/>
+  <rect x='118' y='44' width='154' height='312' rx='14' fill='#0f172a' stroke='#64748b' stroke-width='3'/>
+  <rect x='126' y='52' width='138' height='296' rx='10' fill='#1e293b'/>
+  <circle cx='195' cy='62' r='4' fill='#020617'/>
+  <circle cx='160' cy='115' r='14' fill='#020617' stroke='#94a3b8' stroke-width='2'/>
+  <circle cx='160' cy='150' r='14' fill='#020617' stroke='#94a3b8' stroke-width='2'/>
+  <circle cx='160' cy='185' r='14' fill='#020617' stroke='#94a3b8' stroke-width='2'/>
+  <rect x='286' y='110' width='12' height='210' rx='6' fill='#1e6bb8'/>
+  <path d='M292 92l-6 18h12z' fill='#38bdf8'/>
+</svg>
