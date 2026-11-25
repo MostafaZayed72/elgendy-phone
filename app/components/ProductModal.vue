@@ -90,11 +90,11 @@ const directWhatsappUrl = computed(() => {
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-4 sm:p-6">
             <!-- Image -->
-            <div class="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800/70 p-6 flex items-center justify-center">
+            <div class="aspect-square rounded-2xl bg-slate-100 dark:bg-slate-800/70 overflow-hidden shadow-sm">
               <img
                 :src="product.image"
                 :alt="product.name[lang]"
-                class="w-full h-full object-contain"
+                class="w-full h-full object-cover object-center"
               />
             </div>
 

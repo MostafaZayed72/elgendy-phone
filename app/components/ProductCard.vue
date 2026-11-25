@@ -41,34 +41,37 @@ const handleQuickAdd = (e: Event) => {
     :data-aos-delay="Math.min((index || 0) * 50, 250)"
   >
     <!-- Product Image -->
-    <div class="relative aspect-square bg-slate-100/80 dark:bg-slate-800/60 overflow-hidden p-4 flex items-center justify-center">
-      <img
-        :src="product.image"
-        :alt="product.name[lang]"
-        class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-        loading="lazy"
-      />
+    <div class="p-2 sm:p-2.5 pb-0">
+      <div class="relative aspect-square w-full rounded-2xl bg-slate-100 dark:bg-slate-800/80 overflow-hidden shadow-xs">
+        <img
+          :src="product.image"
+          :alt="product.name[lang]"
+          class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+        />
 
-      <!-- Top Badges -->
-      <div class="absolute top-3 start-3 flex flex-col gap-1.5 items-start">
-        <span
-          v-if="product.badge"
-          class="px-2.5 py-1 rounded-full bg-brand-500 text-white text-[10px] sm:text-xs font-extrabold shadow-sm"
-        >
-          {{ product.badge[lang] }}
-        </span>
-        <span
-          v-if="discountPercent > 0"
-          class="px-2.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black shadow-sm"
-        >
-          -{{ discountPercent }}%
-        </span>
-      </div>
+        <!-- Top Badges -->
+        <div class="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1.5 pointer-events-none">
+          <span
+            v-if="product.badge"
+            class="px-2.5 py-0.5 rounded-full bg-brand-500/95 backdrop-blur-xs text-white text-[10px] sm:text-xs font-extrabold shadow-sm truncate"
+          >
+            {{ product.badge[lang] }}
+          </span>
+          <span v-else />
+          <span
+            v-if="discountPercent > 0"
+            class="px-2 py-0.5 rounded-full bg-rose-500/95 backdrop-blur-xs text-white text-[10px] font-black shadow-sm shrink-0"
+          >
+            -{{ discountPercent }}%
+          </span>
+        </div>
 
-      <!-- Quick View Pill -->
-      <div class="absolute bottom-3 end-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 text-xs font-bold shadow-md backdrop-blur-sm">
-        <Eye class="w-3.5 h-3.5 text-brand-500" />
-        <span>{{ t('catalog.viewDetails') }}</span>
+        <!-- Quick View Pill -->
+        <div class="absolute bottom-2.5 end-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-slate-100 text-xs font-bold shadow-md backdrop-blur-sm">
+          <Eye class="w-3.5 h-3.5 text-brand-500" />
+          <span>{{ t('catalog.viewDetails') }}</span>
+        </div>
       </div>
     </div>
 

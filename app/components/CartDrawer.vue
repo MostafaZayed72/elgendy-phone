@@ -102,7 +102,7 @@ const checkoutUrl = computed(() => buildWhatsAppOrderUrl(lang.value))
               <img
                 :src="item.product.image"
                 :alt="item.product.name[lang]"
-                class="w-16 h-16 rounded-xl object-contain bg-white dark:bg-slate-900 p-1.5 shrink-0"
+                class="w-16 h-16 rounded-xl object-cover object-center bg-white dark:bg-slate-900 shrink-0"
               />
               <div class="flex-1 min-w-0 space-y-1">
                 <div class="flex items-start justify-between gap-2">

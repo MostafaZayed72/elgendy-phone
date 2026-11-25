@@ -90,21 +90,23 @@ const animationDuration = computed(() => {
             @click="emit('select', product)"
             class="w-[148px] sm:w-[184px] shrink-0 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col text-start cursor-pointer"
           >
-            <div class="relative aspect-square w-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-              <img
-                v-if="product.image"
-                :src="product.image"
-                :alt="product.name[lang]"
-                class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                loading="lazy"
-                decoding="async"
-              />
-              <span
-                v-if="product.badge"
-                class="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-brand-500 text-[10px] font-black text-white shadow-xs"
-              >
-                {{ product.badge[lang] }}
-              </span>
+            <div class="p-1.5 pb-0">
+              <div class="relative aspect-square w-full rounded-xl bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <img
+                  v-if="product.image"
+                  :src="product.image"
+                  :alt="product.name[lang]"
+                  class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span
+                  v-if="product.badge"
+                  class="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-brand-500/95 text-[10px] font-black text-white shadow-xs"
+                >
+                  {{ product.badge[lang] }}
+                </span>
+              </div>
             </div>
 
             <div class="p-2.5 flex-1 flex flex-col justify-between gap-1 w-full">
