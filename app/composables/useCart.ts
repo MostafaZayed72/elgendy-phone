@@ -87,15 +87,18 @@ export function useCart() {
     selectedOption?: string,
     color?: string,
     notes?: string,
-    selectedImage?: string
+    selectedImage?: string,
+    selectedRam?: string
   ) => {
     if (product.isOutOfStock) return false
     loadFromStorage()
 
     const cleanOption = selectedOption?.trim() || ''
+    const cleanRam = selectedRam?.trim() || ''
     const cleanColor = color?.trim() || ''
     const keyParts = [product.id]
     if (cleanColor) keyParts.push(`col-${cleanColor}`)
+    if (cleanRam) keyParts.push(`ram-${cleanRam}`)
     if (cleanOption) keyParts.push(`opt-${cleanOption}`)
     const itemId = keyParts.join('_')
 
@@ -111,6 +114,7 @@ export function useCart() {
         quantity,
         price: product.price,
         selectedOption: cleanOption || undefined,
+        selectedRam: cleanRam || undefined,
         color: cleanColor || undefined,
         notes: notes?.trim() || undefined,
         selectedImage: selectedImage || undefined
@@ -158,7 +162,8 @@ export function useCart() {
         `${isAr ? 'السعر' : 'Price'}: ${(item.price * item.quantity).toLocaleString('en-US')} ${isAr ? 'ج.م' : 'EGP'}`
       ]
       if (item.color) details.push(`${isAr ? 'اللون' : 'Color'}: ${item.color}`)
-      if (item.selectedOption) details.push(`${isAr ? 'الخيار' : 'Option'}: ${item.selectedOption}`)
+      if (item.selectedRam) details.push(`${isAr ? 'الرامات' : 'RAM'}: ${item.selectedRam}`)
+      if (item.selectedOption) details.push(`${isAr ? 'المساحة' : 'Storage'}: ${item.selectedOption}`)
       lines.push(`   ${details.join(' | ')}`)
       if (item.notes) lines.push(`   📝 ${item.notes}`)
     })

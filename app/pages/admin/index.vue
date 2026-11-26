@@ -60,6 +60,7 @@ const formProduct = reactive({
   badgeEn: '',
   colorsText: '',
   colorImages: {} as Record<string, string>,
+  ramsText: '',
   optionsText: '',
   isHidden: false,
   isOutOfStock: false
@@ -168,6 +169,7 @@ const openAddProduct = () => {
     badgeEn: '',
     colorsText: '',
     colorImages: {},
+    ramsText: '',
     optionsText: '',
     isHidden: false,
     isOutOfStock: false
@@ -193,6 +195,7 @@ const openEditProduct = (p: Product) => {
     badgeEn: p.badge?.en || '',
     colorsText: (p.colors || []).join('، '),
     colorImages: p.colorImages ? { ...p.colorImages } : {},
+    ramsText: (p.rams || []).join('، '),
     optionsText: (p.options || []).join('، '),
     isHidden: Boolean(p.isHidden),
     isOutOfStock: Boolean(p.isOutOfStock)
@@ -308,6 +311,7 @@ const saveProduct = async () => {
         : undefined,
       colors: activeColors,
       colorImages: cleanColorImages,
+      rams: splitList(formProduct.ramsText),
       options: splitList(formProduct.optionsText),
       isHidden: formProduct.isHidden,
       isOutOfStock: formProduct.isOutOfStock
@@ -967,6 +971,10 @@ const saveSettings = async () => {
               <div>
                 <label class="text-xs font-bold block mb-1">الألوان (افصل بينها بفاصلة)</label>
                 <input v-model="formProduct.colorsText" type="text" placeholder="أسود، أبيض، أزرق" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label class="text-xs font-bold block mb-1">الرامات RAM (افصل بفاصلة)</label>
+                <input v-model="formProduct.ramsText" type="text" placeholder="4GB, 6GB, 8GB, 12GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
               </div>
               <div>
                 <label class="text-xs font-bold block mb-1">المساحات / الخيارات (افصل بفاصلة)</label>

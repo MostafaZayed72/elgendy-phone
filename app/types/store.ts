@@ -32,6 +32,7 @@ export interface Product {
   badge?: LocalizedText
   colors?: string[]
   colorImages?: Record<string, string>
+  rams?: string[]
   options?: string[]
   isHidden?: boolean
   isOutOfStock?: boolean
@@ -44,6 +45,7 @@ export interface CartItem {
   quantity: number
   price: number
   selectedOption?: string
+  selectedRam?: string
   color?: string
   notes?: string
   selectedImage?: string

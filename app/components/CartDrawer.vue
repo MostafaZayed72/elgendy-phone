@@ -121,6 +121,7 @@ const checkoutUrl = computed(() => buildWhatsAppOrderUrl(lang.value))
 
                 <div class="flex flex-wrap gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
                   <span v-if="item.color" class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">{{ item.color }}</span>
+                  <span v-if="item.selectedRam" class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">{{ item.selectedRam }}</span>
                   <span v-if="item.selectedOption" class="px-2 py-0.5 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">{{ item.selectedOption }}</span>
                 </div>
 

@@ -37,6 +37,7 @@ export default {
     "egp": "EGP",
     "discount": "OFF",
     "color": "Color",
+    "ram": "RAM",
     "option": "Storage / Option",
     "quantity": "Quantity",
     "notes": "Additional Notes",

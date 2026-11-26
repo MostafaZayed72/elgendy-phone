@@ -47,6 +47,7 @@ const galleryImages = computed<string[]>(() => {
 const activeImageIndex = ref(0)
 const isZoomOpen = ref(false)
 const selectedColor = ref('')
+const selectedRam = ref('')
 const selectedOption = ref('')
 const quantity = ref(1)
 const notes = ref('')
@@ -55,6 +56,7 @@ watch(product, (p) => {
   if (p) {
     activeImageIndex.value = 0
     selectedColor.value = p.colors?.[0] || ''
+    selectedRam.value = p.rams?.[0] || ''
     selectedOption.value = p.options?.[0] || ''
     quantity.value = 1
     notes.value = ''
@@ -100,7 +102,8 @@ const handleAddToCart = () => {
     selectedOption.value || undefined,
     selectedColor.value || undefined,
     notes.value || undefined,
-    colorImg || activeImage.value || undefined
+    colorImg || activeImage.value || undefined,
+    selectedRam.value || undefined
   )
   if (added) {
     showToast(t('catalog.addedToCart'))
@@ -116,6 +119,7 @@ const directWhatsappUrl = computed(() => {
     `${isAr.value ? 'السعر' : 'Price'}: ${(product.value.price * quantity.value).toLocaleString('en-US')} ${t('catalog.egp')}`
   ]
   if (selectedColor.value) lines.push(`${t('catalog.color')}: ${selectedColor.value}`)
+  if (selectedRam.value) lines.push(`${t('catalog.ram')}: ${selectedRam.value}`)
   if (selectedOption.value) lines.push(`${t('catalog.option')}: ${selectedOption.value}`)
   if (notes.value.trim()) lines.push(`${t('catalog.notes')}: ${notes.value.trim()}`)
   return `https://wa.me/${elgendyStore.whatsappNumber}?text=${encodeURIComponent(lines.join('\n'))}`
@@ -265,7 +269,7 @@ const nextImage = () => {
                 :key="`thumb-${idx}`"
                 type="button"
                 @click="activeImageIndex = idx"
-                class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-white dark:bg-slate-900"
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-white dark:bg-slate-900"
                 :class="activeImageIndex === idx
                   ? 'border-brand-500 ring-2 ring-brand-500/25 scale-[1.03]'
                   : 'border-slate-200 dark:border-slate-800 opacity-75 hover:opacity-100'"
@@ -342,6 +346,26 @@ const nextImage = () => {
             <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
               {{ product.description[lang] }}
             </p>
+          </div>
+
+          <!-- RAM -->
+          <div v-if="product.rams?.length" class="space-y-2">
+            <label class="text-xs font-extrabold text-slate-600 dark:text-slate-300">{{ t('catalog.ram') }}</label>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-for="ram in product.rams"
+                :key="ram"
+                type="button"
+                @click="selectedRam = ram"
+                class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all cursor-pointer flex items-center gap-1.5"
+                :class="selectedRam === ram
+                  ? 'bg-brand-500 text-white border-brand-500 shadow-sm'
+                  : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800'"
+              >
+                <Check v-if="selectedRam === ram" class="w-3.5 h-3.5" />
+                <span>{{ ram }}</span>
+              </button>
+            </div>
           </div>
 
           <!-- Options -->
