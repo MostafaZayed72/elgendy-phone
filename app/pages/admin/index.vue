@@ -28,8 +28,12 @@ const formSettings = reactive({
   heroTitleAr: '',
   heroTitleEn: '',
   heroTaglineAr: '',
-  heroTaglineEn: ''
+  heroTaglineEn: '',
+  promoBannerImage: '',
+  promoBannerEnabled: false,
+  promoBannerLink: ''
 })
+const uploadingBanner = ref(false)
 
 const storeSource = ref<'supabase' | 'local'>('local')
 const supabaseConnected = ref(false)
@@ -106,6 +110,9 @@ const loadDashboard = async () => {
       formSettings.heroTitleEn = res.settings.heroTitle?.en || ''
       formSettings.heroTaglineAr = res.settings.heroTagline?.ar || ''
       formSettings.heroTaglineEn = res.settings.heroTagline?.en || ''
+      formSettings.promoBannerImage = res.settings.promoBannerImage || ''
+      formSettings.promoBannerEnabled = Boolean(res.settings.promoBannerEnabled)
+      formSettings.promoBannerLink = res.settings.promoBannerLink || ''
     }
   } catch (err) {
     console.error(err)
@@ -517,6 +524,32 @@ const seedDatabase = async () => {
   }
 }
 
+const handleBannerUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  uploadingBanner.value = true
+  try {
+    const compressedFile = await compressImage(file, 1920, 1080, 0.85)
+    const fd = new FormData()
+    fd.append('file', compressedFile)
+    const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
+      method: 'POST',
+      body: fd
+    })
+    if (res.url) {
+      formSettings.promoBannerImage = res.url
+      showToast('تم رفع صورة البانر بنجاح')
+    }
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || 'فشل رفع صورة البانر', 'info', 4000)
+  } finally {
+    uploadingBanner.value = false
+    input.value = ''
+  }
+}
+
 const saveSettings = async () => {
   savingSettings.value = true
   try {
@@ -535,7 +568,10 @@ const saveSettings = async () => {
           heroTagline: {
             ar: formSettings.heroTaglineAr.trim(),
             en: formSettings.heroTaglineEn.trim()
-          }
+          },
+          promoBannerImage: formSettings.promoBannerImage.trim(),
+          promoBannerEnabled: Boolean(formSettings.promoBannerEnabled),
+          promoBannerLink: formSettings.promoBannerLink.trim()
         }
       }
     })
@@ -859,6 +895,57 @@ const saveSettings = async () => {
             <div>
               <label class="text-xs font-bold block mb-1">الوصف التعريفي (إنجليزي)</label>
               <textarea v-model="formSettings.heroTaglineEn" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm"></textarea>
+            </div>
+          </div>
+
+          <!-- Static Promo Banner Below Hero -->
+          <div class="pt-5 border-t border-slate-200 dark:border-slate-800 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 class="font-black text-base">البانر الثابت أسفل الهيرو</h3>
+                <p class="text-xs text-slate-500 mt-0.5">ارفع صورة ثابتة لعرضها أسفل الكاروسيل ويمكنك إظهارها أو إخفاؤها في أي وقت.</p>
+              </div>
+              <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 cursor-pointer text-xs font-extrabold">
+                <input v-model="formSettings.promoBannerEnabled" type="checkbox" class="rounded accent-brand-500" />
+                <span>{{ formSettings.promoBannerEnabled ? 'البانر ظاهر في المتجر' : 'البانر مخفي حالياً' }}</span>
+              </label>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-slate-300 dark:border-slate-700 space-y-3">
+              <img
+                v-if="formSettings.promoBannerImage"
+                :src="formSettings.promoBannerImage"
+                alt="Promo Banner"
+                class="w-full max-h-48 object-cover rounded-2xl border border-slate-200 dark:border-slate-700"
+              />
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-extrabold cursor-pointer">
+                  <Loader2 v-if="uploadingBanner" class="w-4 h-4 animate-spin" />
+                  <Upload v-else class="w-4 h-4" />
+                  <span>{{ uploadingBanner ? 'جاري رفع البانر...' : 'رفع صورة البانر من جهازك' }}</span>
+                  <input type="file" accept="image/*" class="hidden" @change="handleBannerUpload" :disabled="uploadingBanner" />
+                </label>
+                <button
+                  v-if="formSettings.promoBannerImage"
+                  type="button"
+                  @click="formSettings.promoBannerImage = ''"
+                  class="px-3 py-2 rounded-xl bg-rose-500/10 text-rose-500 text-xs font-bold cursor-pointer"
+                >
+                  حذف الصورة
+                </button>
+              </div>
+              <input
+                v-model="formSettings.promoBannerImage"
+                type="text"
+                placeholder="أو الصق رابط صورة البانر هنا"
+                class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"
+              />
+              <input
+                v-model="formSettings.promoBannerLink"
+                type="text"
+                placeholder="رابط عند الضغط على البانر (اختياري)"
+                class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"
+              />
             </div>
           </div>
 

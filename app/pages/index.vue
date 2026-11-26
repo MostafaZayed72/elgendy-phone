@@ -162,6 +162,38 @@ const getCategoryIcon = (icon: string) => {
   <div class="flex flex-col min-h-screen">
     <StoreHeader />
     <StoreHero :carousel-products="latestProducts" :settings="storeData?.settings" @select="selectedProduct = $event" />
+
+    <!-- Static Promo Banner Below Hero -->
+    <section
+      v-if="storeData?.settings?.promoBannerEnabled && storeData?.settings?.promoBannerImage"
+      class="w-full px-4 sm:px-6 lg:px-10 pt-5"
+      data-aos="fade-up"
+    >
+      <a
+        v-if="storeData.settings.promoBannerLink"
+        :href="storeData.settings.promoBannerLink"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="block overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-xl transition-shadow"
+      >
+        <img
+          :src="storeData.settings.promoBannerImage"
+          :alt="t('store.name')"
+          class="w-full max-h-[240px] sm:max-h-[360px] md:max-h-[420px] object-cover object-center"
+        />
+      </a>
+      <div
+        v-else
+        class="overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md"
+      >
+        <img
+          :src="storeData.settings.promoBannerImage"
+          :alt="t('store.name')"
+          class="w-full max-h-[240px] sm:max-h-[360px] md:max-h-[420px] object-cover object-center"
+        />
+      </div>
+    </section>
+
     <LatestProductsMarquee :products="latestProducts" @select="selectedProduct = $event" />
 
     <!-- Main Catalog Section -->

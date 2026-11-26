@@ -53,10 +53,16 @@ CREATE TABLE IF NOT EXISTS public.store_settings (
   hero_title_en TEXT,
   hero_tagline_ar TEXT,
   hero_tagline_en TEXT,
+  promo_banner_image TEXT,
+  promo_banner_enabled BOOLEAN DEFAULT false,
+  promo_banner_link TEXT,
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 -- الترقية التلقائية في حال كان الجدول منشأ مسبقاً
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS promo_banner_image TEXT;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS promo_banner_enabled BOOLEAN DEFAULT false;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS promo_banner_link TEXT;
 ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_images JSONB DEFAULT '{}'::jsonb;

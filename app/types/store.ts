@@ -63,6 +63,9 @@ export interface HeroSettings {
   heroBadge: LocalizedText
   heroTitle: LocalizedText
   heroTagline: LocalizedText
+  promoBannerImage?: string
+  promoBannerEnabled?: boolean
+  promoBannerLink?: string
 }
 
 export interface StoreConfig {

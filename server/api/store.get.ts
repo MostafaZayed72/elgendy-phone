@@ -15,7 +15,10 @@ const defaultHeroSettings: HeroSettings = {
   heroTagline: {
     ar: 'خبرة تمتد منذ عام 1999 في عالم الهواتف الذكية والإكسسوارات الأصلية — أحدث الأجهزة، الشواحن السريعة، السماعات، والضمان الحقيقي.',
     en: 'Trusted since 1999 in smartphones & genuine accessories — latest devices, fast chargers, earbuds, and real warranty.'
-  }
+  },
+  promoBannerImage: '',
+  promoBannerEnabled: false,
+  promoBannerLink: ''
 }
 
 export default defineEventHandler(async (event) => {
@@ -49,7 +52,10 @@ export default defineEventHandler(async (event) => {
             heroTagline: {
               ar: settingsRow.hero_tagline_ar || defaultHeroSettings.heroTagline.ar,
               en: settingsRow.hero_tagline_en || defaultHeroSettings.heroTagline.en
-            }
+            },
+            promoBannerImage: settingsRow.promo_banner_image || '',
+            promoBannerEnabled: Boolean(settingsRow.promo_banner_enabled),
+            promoBannerLink: settingsRow.promo_banner_link || ''
           }
         : defaultHeroSettings
 
