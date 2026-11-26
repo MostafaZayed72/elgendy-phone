@@ -22,6 +22,98 @@ const searchQuery = ref<string>('')
 const selectedProduct = ref<Product | null>(null)
 const isFilterSheetOpen = ref(false)
 
+// Draggable floating filter button state
+const filterBtnRef = ref<HTMLElement | null>(null)
+const filterBtnPos = ref<{ x: number; y: number } | null>(null)
+const isDraggingFilter = ref(false)
+let dragStartX = 0
+let dragStartY = 0
+let originLeft = 0
+let originTop = 0
+let hasDragged = false
+
+const clampFilterPos = (x: number, y: number) => {
+  if (!import.meta.client) return { x, y }
+  const w = filterBtnRef.value?.offsetWidth || 56
+  const h = filterBtnRef.value?.offsetHeight || 56
+  return {
+    x: Math.max(8, Math.min(window.innerWidth - w - 8, x)),
+    y: Math.max(8, Math.min(window.innerHeight - h - 8, y))
+  }
+}
+
+const onFilterPointerDown = (e: PointerEvent) => {
+  if (!import.meta.client || !filterBtnRef.value) return
+  const rect = filterBtnRef.value.getBoundingClientRect()
+  dragStartX = e.clientX
+  dragStartY = e.clientY
+  originLeft = rect.left
+  originTop = rect.top
+  hasDragged = false
+  isDraggingFilter.value = true
+  ;(e.currentTarget as HTMLElement)?.setPointerCapture?.(e.pointerId)
+}
+
+const onFilterPointerMove = (e: PointerEvent) => {
+  if (!isDraggingFilter.value) return
+  const dx = e.clientX - dragStartX
+  const dy = e.clientY - dragStartY
+  if (!hasDragged && Math.hypot(dx, dy) > 6) {
+    hasDragged = true
+  }
+  if (hasDragged) {
+    filterBtnPos.value = clampFilterPos(originLeft + dx, originTop + dy)
+  }
+}
+
+const onFilterPointerUp = (e: PointerEvent) => {
+  if (!isDraggingFilter.value) return
+  isDraggingFilter.value = false
+  try {
+    ;(e.currentTarget as HTMLElement)?.releasePointerCapture?.(e.pointerId)
+  } catch {
+    // ignore
+  }
+  if (hasDragged && filterBtnPos.value) {
+    try {
+      localStorage.setItem('elgendy_filter_btn_pos', JSON.stringify(filterBtnPos.value))
+    } catch {
+      // ignore
+    }
+  } else {
+    isFilterSheetOpen.value = true
+  }
+}
+
+const handleFilterResize = () => {
+  if (filterBtnPos.value) {
+    filterBtnPos.value = clampFilterPos(filterBtnPos.value.x, filterBtnPos.value.y)
+  }
+}
+
+onMounted(() => {
+  if (import.meta.client) {
+    try {
+      const saved = localStorage.getItem('elgendy_filter_btn_pos')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
+          filterBtnPos.value = clampFilterPos(parsed.x, parsed.y)
+        }
+      }
+    } catch {
+      // ignore
+    }
+    window.addEventListener('resize', handleFilterResize, { passive: true })
+  }
+})
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    window.removeEventListener('resize', handleFilterResize)
+  }
+})
+
 const selectCategoryAndScroll = (slug: string) => {
   activeCategory.value = slug
   isFilterSheetOpen.value = false
@@ -171,13 +263,23 @@ const getCategoryIcon = (icon: string) => {
     <StoreFooter />
     <ProductModal :product="selectedProduct" @close="selectedProduct = null" />
 
-    <!-- Floating Category Filter Button (above PWA Install button) -->
-    <div v-if="categories.length > 0" class="fixed bottom-20 start-4 sm:start-6 z-40">
+    <!-- Floating Draggable Category Filter Button -->
+    <div
+      v-if="categories.length > 0"
+      ref="filterBtnRef"
+      class="fixed z-40 touch-none select-none"
+      :class="filterBtnPos ? '' : 'bottom-20 start-4 sm:start-6'"
+      :style="filterBtnPos ? { left: `${filterBtnPos.x}px`, top: `${filterBtnPos.y}px` } : undefined"
+    >
       <button
         type="button"
-        @click="isFilterSheetOpen = true"
-        class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer ring-4 ring-white/80 dark:ring-slate-900/80"
-        :title="lang === 'ar' ? 'تصفية حسب القسم' : 'Filter by Category'"
+        @pointerdown="onFilterPointerDown"
+        @pointermove="onFilterPointerMove"
+        @pointerup="onFilterPointerUp"
+        @pointercancel="isDraggingFilter = false"
+        class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-transform duration-200 active:scale-95 ring-4 ring-white/80 dark:ring-slate-900/80"
+        :class="isDraggingFilter ? 'cursor-grabbing scale-110' : 'cursor-grab hover:scale-105'"
+        :title="lang === 'ar' ? 'تصفية حسب القسم (اسحب لتحريك الزر)' : 'Filter by Category (Drag to move)'"
         :aria-label="lang === 'ar' ? 'تصفية حسب القسم' : 'Filter by Category'"
       >
         <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
