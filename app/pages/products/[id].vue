@@ -36,6 +36,11 @@ const galleryImages = computed<string[]>(() => {
       if (img) list.add(img)
     })
   }
+  if (product.value.colorImages) {
+    Object.values(product.value.colorImages).forEach((img) => {
+      if (img) list.add(img)
+    })
+  }
   return Array.from(list)
 })
 
@@ -55,6 +60,16 @@ watch(product, (p) => {
     notes.value = ''
   }
 }, { immediate: true })
+
+watch(selectedColor, (col) => {
+  if (!col || !product.value?.colorImages) return
+  const linkedImg = product.value.colorImages[col]
+  if (!linkedImg) return
+  const idx = galleryImages.value.indexOf(linkedImg)
+  if (idx !== -1) {
+    activeImageIndex.value = idx
+  }
+})
 
 const activeImage = computed(() => {
   return galleryImages.value[activeImageIndex.value] || product.value?.image || ''
@@ -78,12 +93,14 @@ useSeoMeta({
 
 const handleAddToCart = () => {
   if (!product.value) return
+  const colorImg = selectedColor.value ? product.value.colorImages?.[selectedColor.value] : undefined
   const added = addToCart(
     product.value,
     quantity.value,
     selectedOption.value || undefined,
     selectedColor.value || undefined,
-    notes.value || undefined
+    notes.value || undefined,
+    colorImg || activeImage.value || undefined
   )
   if (added) {
     showToast(t('catalog.addedToCart'))

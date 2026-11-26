@@ -86,7 +86,8 @@ export function useCart() {
     quantity = 1,
     selectedOption?: string,
     color?: string,
-    notes?: string
+    notes?: string,
+    selectedImage?: string
   ) => {
     if (product.isOutOfStock) return false
     loadFromStorage()
@@ -102,6 +103,7 @@ export function useCart() {
     if (existing) {
       existing.quantity += quantity
       if (notes?.trim()) existing.notes = notes.trim()
+      if (selectedImage) existing.selectedImage = selectedImage
     } else {
       items.value.push({
         id: itemId,
@@ -110,7 +112,8 @@ export function useCart() {
         price: product.price,
         selectedOption: cleanOption || undefined,
         color: cleanColor || undefined,
-        notes: notes?.trim() || undefined
+        notes: notes?.trim() || undefined,
+        selectedImage: selectedImage || undefined
       })
     }
 

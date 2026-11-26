@@ -57,12 +57,19 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const result = await uploadBufferToCloudinary(fileBuffer, 'elgendy-phone/products')
-
-  return {
-    success: true,
-    url: result.secure_url,
-    public_id: result.public_id,
-    maxImages
+  try {
+    const result = await uploadBufferToCloudinary(fileBuffer, 'elgendy-phone/products')
+    return {
+      success: true,
+      url: result.secure_url,
+      public_id: result.public_id,
+      maxImages
+    }
+  } catch (err: any) {
+    const msg = err?.error?.message || err?.message || 'فشل رفع الصورة إلى السحابة'
+    throw createError({
+      statusCode: err?.http_code || 500,
+      statusMessage: `خطأ في خدمة الصور: ${msg}`
+    })
   }
 })

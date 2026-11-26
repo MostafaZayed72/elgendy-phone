@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
           images: Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
           badge: p.badge_ar ? { ar: p.badge_ar, en: p.badge_en || p.badge_ar } : undefined,
           colors: Array.isArray(p.colors) ? p.colors : [],
+          colorImages: p.color_images && typeof p.color_images === 'object' ? p.color_images : {},
           options: Array.isArray(p.options) ? p.options : [],
           isHidden: Boolean(p.is_hidden),
           isOutOfStock: Boolean(p.is_out_of_stock),

@@ -6,6 +6,7 @@ import {
 } from 'lucide-vue-next'
 import type { Category, Product } from '~/types/store'
 import { elgendyStore } from '~/data/elgendy-store'
+import { compressImage } from '~/utils/imageCompressor'
 
 definePageMeta({
   layout: false
@@ -48,6 +49,7 @@ const formProduct = reactive({
   badgeAr: '',
   badgeEn: '',
   colorsText: '',
+  colorImages: {} as Record<string, string>,
   optionsText: '',
   isHidden: false,
   isOutOfStock: false
@@ -118,6 +120,10 @@ const filteredProducts = computed(() => {
   )
 })
 
+const parsedColors = computed(() =>
+  formProduct.colorsText.split(/[,،]/).map(s => s.trim()).filter(Boolean)
+)
+
 const openAddProduct = () => {
   editingProduct.value = null
   Object.assign(formProduct, {
@@ -135,6 +141,7 @@ const openAddProduct = () => {
     badgeAr: '',
     badgeEn: '',
     colorsText: '',
+    colorImages: {},
     optionsText: '',
     isHidden: false,
     isOutOfStock: false
@@ -159,6 +166,7 @@ const openEditProduct = (p: Product) => {
     badgeAr: p.badge?.ar || '',
     badgeEn: p.badge?.en || '',
     colorsText: (p.colors || []).join('، '),
+    colorImages: p.colorImages ? { ...p.colorImages } : {},
     optionsText: (p.options || []).join('، '),
     isHidden: Boolean(p.isHidden),
     isOutOfStock: Boolean(p.isOutOfStock)
@@ -184,8 +192,9 @@ const handleImageUpload = async (event: Event) => {
         showToast(`تم الوصول للحد الأقصى (${maxImages.value} صورة)`, 'info')
         break
       }
+      const compressedFile = await compressImage(file)
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', compressedFile)
       const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
         method: 'POST',
         body: fd
@@ -244,6 +253,14 @@ const saveProduct = async () => {
     const splitList = (txt: string) =>
       txt.split(/[,،]/).map(s => s.trim()).filter(Boolean)
 
+    const cleanColorImages: Record<string, string> = {}
+    const activeColors = splitList(formProduct.colorsText)
+    for (const col of activeColors) {
+      if (formProduct.colorImages[col]) {
+        cleanColorImages[col] = formProduct.colorImages[col]
+      }
+    }
+
     const payload: Product = {
       id: formProduct.id || `prod-${Date.now()}`,
       categorySlug: formProduct.categorySlug,
@@ -263,7 +280,8 @@ const saveProduct = async () => {
       badge: formProduct.badgeAr.trim()
         ? { ar: formProduct.badgeAr.trim(), en: formProduct.badgeEn.trim() || formProduct.badgeAr.trim() }
         : undefined,
-      colors: splitList(formProduct.colorsText),
+      colors: activeColors,
+      colorImages: cleanColorImages,
       options: splitList(formProduct.optionsText),
       isHidden: formProduct.isHidden,
       isOutOfStock: formProduct.isOutOfStock
@@ -342,8 +360,9 @@ const handleCategoryImageUpload = async (event: Event) => {
 
   uploadingCategoryImage.value = true
   try {
+    const compressedFile = await compressImage(file)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', compressedFile)
     const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
       method: 'POST',
       body: fd
@@ -750,6 +769,37 @@ const seedDatabase = async () => {
               </div>
             </div>
 
+            <!-- Link Each Color to its Image -->
+            <div v-if="parsedColors.length > 0 && formProduct.images.length > 0" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200">ربط كل لون بصورته (اختياري)</span>
+                <span class="text-[11px] text-slate-400">اضغط على الصورة المناسبة لكل لون</span>
+              </div>
+              <div class="space-y-2">
+                <div
+                  v-for="col in parsedColors"
+                  :key="`link-${col}`"
+                  class="flex items-center justify-between gap-3 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700/70"
+                >
+                  <span class="text-xs font-extrabold text-slate-800 dark:text-slate-100 shrink-0 min-w-[70px]">{{ col }}</span>
+                  <div class="flex items-center gap-1.5 overflow-x-auto py-0.5">
+                    <button
+                      v-for="(imgUrl, iIdx) in formProduct.images"
+                      :key="`col-img-${col}-${iIdx}`"
+                      type="button"
+                      @click="formProduct.colorImages[col] = formProduct.colorImages[col] === imgUrl ? '' : imgUrl"
+                      class="w-10 h-10 rounded-lg overflow-hidden border-2 shrink-0 cursor-pointer transition-all"
+                      :class="formProduct.colorImages[col] === imgUrl
+                        ? 'border-brand-500 ring-2 ring-brand-500/30 scale-105'
+                        : 'border-slate-200 dark:border-slate-700 opacity-65 hover:opacity-100'"
+                    >
+                      <img :src="imgUrl" class="w-full h-full object-cover" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="text-xs font-bold block mb-1">اسم المنتج (عربي) *</label>
@@ -784,6 +834,37 @@ const seedDatabase = async () => {
               <div>
                 <label class="text-xs font-bold block mb-1">المساحات / الخيارات (افصل بفاصلة)</label>
                 <input v-model="formProduct.optionsText" type="text" placeholder="128GB, 256GB, 512GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
+              </div>
+            </div>
+
+            <!-- Link Each Color to its Image -->
+            <div v-if="parsedColors.length > 0 && formProduct.images.length > 0" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200">ربط كل لون بصورته (اختياري)</span>
+                <span class="text-[11px] text-slate-400">اضغط على الصورة المناسبة لكل لون</span>
+              </div>
+              <div class="space-y-2">
+                <div
+                  v-for="col in parsedColors"
+                  :key="`link-${col}`"
+                  class="flex items-center justify-between gap-3 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700/70"
+                >
+                  <span class="text-xs font-extrabold text-slate-800 dark:text-slate-100 shrink-0 min-w-[70px]">{{ col }}</span>
+                  <div class="flex items-center gap-1.5 overflow-x-auto py-0.5">
+                    <button
+                      v-for="(imgUrl, iIdx) in formProduct.images"
+                      :key="`col-img-${col}-${iIdx}`"
+                      type="button"
+                      @click="formProduct.colorImages[col] = formProduct.colorImages[col] === imgUrl ? '' : imgUrl"
+                      class="w-10 h-10 rounded-lg overflow-hidden border-2 shrink-0 cursor-pointer transition-all"
+                      :class="formProduct.colorImages[col] === imgUrl
+                        ? 'border-brand-500 ring-2 ring-brand-500/30 scale-105'
+                        : 'border-slate-200 dark:border-slate-700 opacity-65 hover:opacity-100'"
+                    >
+                      <img :src="imgUrl" class="w-full h-full object-cover" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
