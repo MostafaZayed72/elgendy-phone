@@ -16,6 +16,7 @@ export interface Category {
   slug: string
   name: LocalizedText
   icon: 'smartphone' | 'headphones' | 'zap' | 'shield'
+  image?: string
 }
 
 export interface Product {

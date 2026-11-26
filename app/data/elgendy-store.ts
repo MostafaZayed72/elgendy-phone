@@ -47,25 +47,29 @@ export const storeCategories: Category[] = [
     id: 'cat-smartphones',
     slug: 'smartphones',
     name: { ar: 'هواتف ذكية', en: 'Smartphones' },
-    icon: 'smartphone'
+    icon: 'smartphone',
+    image: '/images/categories/smartphones.svg'
   },
   {
     id: 'cat-audio',
     slug: 'audio-wearables',
     name: { ar: 'سماعات وساعات ذكية', en: 'Audio & Smartwatches' },
-    icon: 'headphones'
+    icon: 'headphones',
+    image: '/images/categories/audio-wearables.svg'
   },
   {
     id: 'cat-chargers',
     slug: 'chargers-power',
     name: { ar: 'شواحن وباور بانك', en: 'Chargers & Power Banks' },
-    icon: 'zap'
+    icon: 'zap',
+    image: '/images/categories/chargers-power.svg'
   },
   {
     id: 'cat-protection',
     slug: 'cases-protection',
     name: { ar: 'جرابات وحماية الشاشة', en: 'Cases & Protection' },
-    icon: 'shield'
+    icon: 'shield',
+    image: '/images/categories/cases-protection.svg'
   }
 ]
 

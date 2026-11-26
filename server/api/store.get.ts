@@ -21,12 +21,16 @@ export default defineEventHandler(async (event) => {
       ])
 
       if (!catErr && !prodErr && ((catRows && catRows.length > 0) || (prodRows && prodRows.length > 0))) {
-        const categories: Category[] = (catRows || []).map((c: any) => ({
-          id: c.id,
-          slug: c.slug,
-          name: { ar: c.name_ar, en: c.name_en },
-          icon: c.icon || 'smartphone'
-        }))
+        const categories: Category[] = (catRows || []).map((c: any) => {
+          const fallbackCat = storeCategories.find(sc => sc.slug === c.slug)
+          return {
+            id: c.id,
+            slug: c.slug,
+            name: { ar: c.name_ar, en: c.name_en },
+            icon: c.icon || 'smartphone',
+            image: c.image || fallbackCat?.image || undefined
+          }
+        })
 
         const allProducts: Product[] = (prodRows || []).map((p: any) => ({
           id: p.id,

@@ -56,12 +56,14 @@ const formProduct = reactive({
 // Category Modal State
 const showCategoryModal = ref(false)
 const savingCategory = ref(false)
+const uploadingCategoryImage = ref(false)
 const formCategory = reactive({
   id: '',
   slug: '',
   nameAr: '',
   nameEn: '',
-  icon: 'smartphone' as 'smartphone' | 'headphones' | 'zap' | 'shield'
+  icon: 'smartphone' as 'smartphone' | 'headphones' | 'zap' | 'shield',
+  image: ''
 })
 
 const loadDashboard = async () => {
@@ -315,7 +317,8 @@ const openAddCategory = () => {
     slug: '',
     nameAr: '',
     nameEn: '',
-    icon: 'smartphone'
+    icon: 'smartphone',
+    image: ''
   })
   showCategoryModal.value = true
 }
@@ -326,9 +329,35 @@ const openEditCategory = (c: Category) => {
     slug: c.slug,
     nameAr: c.name.ar,
     nameEn: c.name.en,
-    icon: c.icon
+    icon: c.icon,
+    image: c.image || ''
   })
   showCategoryModal.value = true
+}
+
+const handleCategoryImageUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+
+  uploadingCategoryImage.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
+      method: 'POST',
+      body: fd
+    })
+    if (res.url) {
+      formCategory.image = res.url
+      showToast('تم رفع لوجو القسم بنجاح')
+    }
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || 'فشل رفع الصورة', 'info', 4000)
+  } finally {
+    uploadingCategoryImage.value = false
+    input.value = ''
+  }
 }
 
 const saveCategory = async () => {
@@ -345,7 +374,8 @@ const saveCategory = async () => {
             ar: formCategory.nameAr.trim(),
             en: formCategory.nameEn.trim() || formCategory.nameAr.trim()
           },
-          icon: formCategory.icon
+          icon: formCategory.icon,
+          image: formCategory.image.trim() || undefined
         }
       }
     })
@@ -626,9 +656,17 @@ const seedDatabase = async () => {
             :key="cat.id"
             class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between gap-3"
           >
-            <div>
-              <h3 class="font-extrabold text-sm">{{ cat.name.ar }}</h3>
-              <p class="text-xs text-slate-400">{{ cat.name.en }} ({{ cat.slug }})</p>
+            <div class="flex items-center gap-3 min-w-0">
+              <img
+                v-if="cat.image"
+                :src="cat.image"
+                :alt="cat.name.ar"
+                class="w-11 h-11 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0"
+              />
+              <div class="min-w-0">
+                <h3 class="font-extrabold text-sm truncate">{{ cat.name.ar }}</h3>
+                <p class="text-xs text-slate-400 truncate">{{ cat.name.en }} ({{ cat.slug }})</p>
+              </div>
             </div>
             <div class="flex items-center gap-1.5">
               <button type="button" @click="openEditCategory(cat)" class="p-2 rounded-xl bg-brand-500/10 text-brand-500 cursor-pointer">
@@ -797,6 +835,29 @@ const seedDatabase = async () => {
             </div>
 
             <div class="space-y-3">
+              <!-- Category Logo Upload -->
+              <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-slate-300 dark:border-slate-700 flex items-center gap-3">
+                <img
+                  v-if="formCategory.image"
+                  :src="formCategory.image"
+                  class="w-14 h-14 rounded-xl object-cover bg-white shrink-0"
+                />
+                <div class="flex-1 space-y-2 min-w-0">
+                  <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-extrabold cursor-pointer">
+                    <Loader2 v-if="uploadingCategoryImage" class="w-3.5 h-3.5 animate-spin" />
+                    <Upload v-else class="w-3.5 h-3.5" />
+                    <span>{{ uploadingCategoryImage ? 'جاري الرفع...' : 'رفع لوجو للقسم' }}</span>
+                    <input type="file" accept="image/*" class="hidden" @change="handleCategoryImageUpload" :disabled="uploadingCategoryImage" />
+                  </label>
+                  <input
+                    v-model="formCategory.image"
+                    type="text"
+                    placeholder="أو الصق رابط صورة اللوجو هنا"
+                    class="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label class="text-xs font-bold block mb-1">اسم القسم (عربي) *</label>
                 <input v-model="formCategory.nameAr" type="text" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm" />

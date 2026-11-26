@@ -27,13 +27,21 @@ export default defineEventHandler(async (event) => {
     c.slug?.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-') ||
     `cat-${Date.now()}`
 
-  const { error } = await supabase.from('categories').upsert({
+  const payload: Record<string, any> = {
     id,
     slug,
     name_ar: c.name.ar,
     name_en: c.name.en || c.name.ar,
-    icon: c.icon || 'smartphone'
-  })
+    icon: c.icon || 'smartphone',
+    image: c.image || null
+  }
+
+  let { error } = await supabase.from('categories').upsert(payload)
+  if (error && error.message?.includes('image')) {
+    delete payload.image
+    const retry = await supabase.from('categories').upsert(payload)
+    error = retry.error
+  }
 
   if (error) {
     throw createError({

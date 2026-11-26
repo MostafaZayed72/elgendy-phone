@@ -19,10 +19,16 @@ export default defineEventHandler(async (event) => {
     name_ar: c.name.ar,
     name_en: c.name.en,
     icon: c.icon,
+    image: c.image || null,
     sort_order: idx
   }))
 
-  const { error: catErr } = await supabase.from('categories').upsert(catPayloads, { onConflict: 'id', ignoreDuplicates: true })
+  let { error: catErr } = await supabase.from('categories').upsert(catPayloads, { onConflict: 'id', ignoreDuplicates: true })
+  if (catErr && catErr.message?.includes('image')) {
+    const noImgCats = catPayloads.map(({ image, ...rest }) => rest)
+    const retry = await supabase.from('categories').upsert(noImgCats, { onConflict: 'id', ignoreDuplicates: true })
+    catErr = retry.error
+  }
   if (catErr) {
     throw createError({ statusCode: 500, statusMessage: catErr.message })
   }

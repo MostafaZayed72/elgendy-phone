@@ -107,12 +107,18 @@ const getCategoryIcon = (icon: string) => {
           :key="cat.id"
           type="button"
           @click="activeCategory = cat.slug"
-          class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold border transition-all cursor-pointer"
+          class="shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-extrabold border transition-all cursor-pointer"
           :class="activeCategory === cat.slug
             ? 'bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20'
             : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-brand-500/40'"
         >
-          <component :is="getCategoryIcon(cat.icon)" class="w-4 h-4" />
+          <img
+            v-if="cat.image"
+            :src="cat.image"
+            :alt="cat.name[lang]"
+            class="w-7 h-7 rounded-xl object-cover shrink-0 bg-white/90 shadow-2xs"
+          />
+          <component v-else :is="getCategoryIcon(cat.icon)" class="w-4 h-4" />
           <span>{{ cat.name[lang] }}</span>
         </button>
       </div>

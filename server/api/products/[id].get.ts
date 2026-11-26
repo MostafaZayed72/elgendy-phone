@@ -47,12 +47,16 @@ export default defineEventHandler(async (event) => {
           featured: Boolean(p.featured)
         })
 
-        const categories: Category[] = (catRows || []).map((c: any) => ({
-          id: c.id,
-          slug: c.slug,
-          name: { ar: c.name_ar, en: c.name_en },
-          icon: c.icon || 'smartphone'
-        }))
+        const categories: Category[] = (catRows || []).map((c: any) => {
+          const fallbackCat = storeCategories.find(sc => sc.slug === c.slug)
+          return {
+            id: c.id,
+            slug: c.slug,
+            name: { ar: c.name_ar, en: c.name_en },
+            icon: c.icon || 'smartphone',
+            image: c.image || fallbackCat?.image || undefined
+          }
+        })
 
         return {
           product: mapProduct(prodRow),

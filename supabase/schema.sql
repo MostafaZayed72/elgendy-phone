@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   name_ar TEXT NOT NULL,
   name_en TEXT NOT NULL,
   icon TEXT DEFAULT 'smartphone',
+  image TEXT,
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT now()
 );
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- الترقية التلقائية في حال كان الجدول منشأ مسبقاً
+ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 
 -- فهارس لتحسين سرعة الاستعلام
