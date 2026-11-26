@@ -42,6 +42,18 @@ CREATE TABLE IF NOT EXISTS public.products (
   updated_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 3. جدول إعدادات الواجهة الرئيسية (store_settings)
+CREATE TABLE IF NOT EXISTS public.store_settings (
+  id TEXT PRIMARY KEY DEFAULT 'default',
+  hero_badge_ar TEXT,
+  hero_badge_en TEXT,
+  hero_title_ar TEXT,
+  hero_title_en TEXT,
+  hero_tagline_ar TEXT,
+  hero_tagline_en TEXT,
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- الترقية التلقائية في حال كان الجدول منشأ مسبقاً
 ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
@@ -54,6 +66,7 @@ CREATE INDEX IF NOT EXISTS idx_products_created ON public.products (created_at D
 -- تمكين سياسات الأمان (RLS)
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
 
 -- سياسات القراءة العامة للزوار
 DROP POLICY IF EXISTS "Allow public read categories" ON public.categories;
@@ -62,6 +75,9 @@ CREATE POLICY "Allow public read categories" ON public.categories FOR SELECT USI
 DROP POLICY IF EXISTS "Allow public read products" ON public.products;
 CREATE POLICY "Allow public read products" ON public.products FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Allow public read settings" ON public.store_settings;
+CREATE POLICY "Allow public read settings" ON public.store_settings FOR SELECT USING (true);
+
 -- سياسات الكتابة (يتم تنفيذها عبر السيرفر باستخدام Service Role أو من لوحة التحكم)
 DROP POLICY IF EXISTS "Allow all write categories" ON public.categories;
 CREATE POLICY "Allow all write categories" ON public.categories FOR ALL USING (true) WITH CHECK (true);
@@ -69,7 +85,11 @@ CREATE POLICY "Allow all write categories" ON public.categories FOR ALL USING (t
 DROP POLICY IF EXISTS "Allow all write products" ON public.products;
 CREATE POLICY "Allow all write products" ON public.products FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow all write settings" ON public.store_settings;
+CREATE POLICY "Allow all write settings" ON public.store_settings FOR ALL USING (true) WITH CHECK (true);
+
 -- منح صلاحيات الوصول الكاملة للجداول في قاعدة البيانات
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT ALL ON TABLE public.categories TO anon, authenticated, service_role;
 GRANT ALL ON TABLE public.products TO anon, authenticated, service_role;
+GRANT ALL ON TABLE public.store_settings TO anon, authenticated, service_role;

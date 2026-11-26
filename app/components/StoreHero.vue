@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Sparkles, ArrowUpRight } from 'lucide-vue-next'
-import type { Product } from '~/types/store'
+import type { HeroSettings, Product } from '~/types/store'
 import { elgendyStore } from '~/data/elgendy-store'
 
 const props = defineProps<{
   carouselProducts?: Product[]
+  settings?: HeroSettings
 }>()
 
 const emit = defineEmits<{
@@ -90,7 +91,7 @@ onUnmounted(() => {
           : 'bg-brand-500/10 text-brand-500 border border-brand-500/20'"
       >
         <Sparkles class="w-3.5 h-3.5" />
-        <span>{{ lang === 'ar' ? 'كتالوج المنتجات الرسمي' : 'Official Product Catalog' }}</span>
+        <span>{{ settings?.heroBadge?.[lang] || (lang === 'ar' ? 'كتالوج المنتجات الرسمي' : 'Official Product Catalog') }}</span>
       </div>
 
       <div class="space-y-2 max-w-3xl mx-auto px-2">
@@ -98,13 +99,13 @@ onUnmounted(() => {
           class="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight break-words"
           :class="slides.length > 0 ? 'text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)]' : 'text-slate-900 dark:text-white'"
         >
-          {{ elgendyStore.name.en }}
+          {{ settings?.heroTitle?.[lang] || elgendyStore.name.en }}
         </h1>
         <p
           class="text-xs sm:text-sm md:text-base font-semibold max-w-xl mx-auto leading-relaxed"
           :class="slides.length > 0 ? 'text-slate-100 drop-shadow-[0_1px_6px_rgba(0,0,0,0.65)]' : 'text-slate-600 dark:text-slate-400'"
         >
-          {{ t('store.tagline') }}
+          {{ settings?.heroTagline?.[lang] || t('store.tagline') }}
         </p>
       </div>
 

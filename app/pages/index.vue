@@ -60,7 +60,7 @@ const getCategoryIcon = (icon: string) => {
 <template>
   <div class="flex flex-col min-h-screen">
     <StoreHeader />
-    <StoreHero :carousel-products="latestProducts" @select="selectedProduct = $event" />
+    <StoreHero :carousel-products="latestProducts" :settings="storeData?.settings" @select="selectedProduct = $event" />
     <LatestProductsMarquee :products="latestProducts" @select="selectedProduct = $event" />
 
     <!-- Main Catalog Section -->

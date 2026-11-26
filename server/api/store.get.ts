@@ -1,7 +1,22 @@
 import { storeCategories, storeProducts } from '~~/app/data/elgendy-store'
 import { getServerSupabase, getUploadedImagesCount } from '~~/server/utils/supabase'
 import { isCloudinaryConfigured } from '~~/server/utils/cloudinary'
-import type { Category, Product } from '~~/app/types/store'
+import type { Category, HeroSettings, Product } from '~~/app/types/store'
+
+const defaultHeroSettings: HeroSettings = {
+  heroBadge: {
+    ar: 'كتالوج المنتجات الرسمي',
+    en: 'Official Product Catalog'
+  },
+  heroTitle: {
+    ar: 'EL-GENDY Mobile Store',
+    en: 'EL-GENDY Mobile Store'
+  },
+  heroTagline: {
+    ar: 'خبرة تمتد منذ عام 1999 في عالم الهواتف الذكية والإكسسوارات الأصلية — أحدث الأجهزة، الشواحن السريعة، السماعات، والضمان الحقيقي.',
+    en: 'Trusted since 1999 in smartphones & genuine accessories — latest devices, fast chargers, earbuds, and real warranty.'
+  }
+}
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -15,10 +30,28 @@ export default defineEventHandler(async (event) => {
 
   if (supabase) {
     try {
-      const [{ data: catRows, error: catErr }, { data: prodRows, error: prodErr }] = await Promise.all([
+      const [{ data: catRows, error: catErr }, { data: prodRows, error: prodErr }, { data: settingsRow }] = await Promise.all([
         supabase.from('categories').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: true }),
-        supabase.from('products').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false })
+        supabase.from('products').select('*').order('sort_order', { ascending: true }).order('created_at', { ascending: false }),
+        supabase.from('store_settings').select('*').eq('id', 'default').maybeSingle()
       ])
+
+      const settings: HeroSettings = settingsRow
+        ? {
+            heroBadge: {
+              ar: settingsRow.hero_badge_ar || defaultHeroSettings.heroBadge.ar,
+              en: settingsRow.hero_badge_en || defaultHeroSettings.heroBadge.en
+            },
+            heroTitle: {
+              ar: settingsRow.hero_title_ar || defaultHeroSettings.heroTitle.ar,
+              en: settingsRow.hero_title_en || defaultHeroSettings.heroTitle.en
+            },
+            heroTagline: {
+              ar: settingsRow.hero_tagline_ar || defaultHeroSettings.heroTagline.ar,
+              en: settingsRow.hero_tagline_en || defaultHeroSettings.heroTagline.en
+            }
+          }
+        : defaultHeroSettings
 
       if (!catErr && !prodErr && ((catRows && catRows.length > 0) || (prodRows && prodRows.length > 0))) {
         const categories: Category[] = (catRows || []).map((c: any) => {
@@ -60,6 +93,7 @@ export default defineEventHandler(async (event) => {
           cloudinaryConnected,
           imageCount,
           maxImages,
+          settings,
           categories: categories.length > 0 ? categories : storeCategories,
           products
         }
@@ -75,6 +109,7 @@ export default defineEventHandler(async (event) => {
     cloudinaryConnected,
     imageCount: storeProducts.length,
     maxImages,
+    settings: defaultHeroSettings,
     categories: storeCategories,
     products: includeHidden ? storeProducts : storeProducts.filter(p => !p.isHidden)
   }

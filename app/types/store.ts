@@ -56,6 +56,12 @@ export interface CustomerInfo {
   notes: string
 }
 
+export interface HeroSettings {
+  heroBadge: LocalizedText
+  heroTitle: LocalizedText
+  heroTagline: LocalizedText
+}
+
 export interface StoreConfig {
   slug: string
   name: LocalizedText

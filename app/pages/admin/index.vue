@@ -16,10 +16,20 @@ const colorMode = useColorMode()
 const { showToast } = useToast()
 
 const checkingAuth = ref(true)
-const activeTab = ref<'products' | 'categories'>('products')
+const activeTab = ref<'products' | 'categories' | 'settings'>('products')
 const searchQuery = ref('')
 const loadingStore = ref(false)
 const seeding = ref(false)
+const savingSettings = ref(false)
+
+const formSettings = reactive({
+  heroBadgeAr: '',
+  heroBadgeEn: '',
+  heroTitleAr: '',
+  heroTitleEn: '',
+  heroTaglineAr: '',
+  heroTaglineEn: ''
+})
 
 const storeSource = ref<'supabase' | 'local'>('local')
 const supabaseConnected = ref(false)
@@ -79,6 +89,22 @@ const loadDashboard = async () => {
     maxImages.value = res.maxImages || 250
     categories.value = res.categories || []
     products.value = res.products || []
+    if (res.settings) {
+      heroSettings.heroBadge.ar = res.settings.heroBadge?.ar || heroSettings.heroBadge.ar
+      heroSettings.heroBadge.en = res.settings.heroBadge?.en || heroSettings.heroBadge.en
+      heroSettings.heroTitle.ar = res.settings.heroTitle?.ar || heroSettings.heroTitle.ar
+      heroSettings.heroTitle.en = res.settings.heroTitle?.en || heroSettings.heroTitle.en
+      heroSettings.heroTagline.ar = res.settings.heroTagline?.ar || heroSettings.heroTagline.ar
+      heroSettings.heroTagline.en = res.settings.heroTagline?.en || heroSettings.heroTagline.en
+    }
+    if (res.settings) {
+      formSettings.heroBadgeAr = res.settings.heroBadge?.ar || ''
+      formSettings.heroBadgeEn = res.settings.heroBadge?.en || ''
+      formSettings.heroTitleAr = res.settings.heroTitle?.ar || ''
+      formSettings.heroTitleEn = res.settings.heroTitle?.en || ''
+      formSettings.heroTaglineAr = res.settings.heroTagline?.ar || ''
+      formSettings.heroTaglineEn = res.settings.heroTagline?.en || ''
+    }
   } catch (err) {
     console.error(err)
   } finally {
@@ -422,6 +448,21 @@ const deleteCategory = async (c: Category) => {
   }
 }
 
+const saveHeroSettings = async () => {
+  savingSettings.value = true
+  try {
+    await $fetch('/api/settings', {
+      method: 'POST',
+      body: { settings: heroSettings }
+    })
+    showToast('تم حفظ إعدادات الواجهة بنجاح')
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || 'تعذر حفظ الإعدادات — تأكد من تشغيل schema.sql', 'info', 4000)
+  } finally {
+    savingSettings.value = false
+  }
+}
+
 const seedDatabase = async () => {
   seeding.value = true
   try {
@@ -434,6 +475,37 @@ const seedDatabase = async () => {
     showToast(err?.data?.statusMessage || 'تأكد من تشغيل schema.sql وتعبئة .env', 'info', 4000)
   } finally {
     seeding.value = false
+  }
+}
+
+const saveSettings = async () => {
+  savingSettings.value = true
+  try {
+    await $fetch('/api/settings', {
+      method: 'POST',
+      body: {
+        settings: {
+          heroBadge: {
+            ar: formSettings.heroBadgeAr.trim(),
+            en: formSettings.heroBadgeEn.trim()
+          },
+          heroTitle: {
+            ar: formSettings.heroTitleAr.trim(),
+            en: formSettings.heroTitleEn.trim()
+          },
+          heroTagline: {
+            ar: formSettings.heroTaglineAr.trim(),
+            en: formSettings.heroTaglineEn.trim()
+          }
+        }
+      }
+    })
+    showToast('تم حفظ إعدادات الواجهة بنجاح')
+    await loadDashboard()
+  } catch (err: any) {
+    showToast(err?.data?.statusMessage || 'تعذر حفظ الإعدادات — تأكد من تشغيل جدول store_settings', 'info', 4000)
+  } finally {
+    savingSettings.value = false
   }
 }
 </script>
@@ -578,6 +650,22 @@ const seedDatabase = async () => {
             >
               الأقسام ({{ categories.length }})
             </button>
+            <button
+              type="button"
+              @click="activeTab = 'settings'"
+              class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer"
+              :class="activeTab === 'settings' ? 'bg-brand-500 text-white shadow' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800'"
+            >
+              إعدادات الواجهة
+            </button>
+            <button
+              type="button"
+              @click="activeTab = 'settings'"
+              class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer"
+              :class="activeTab === 'settings' ? 'bg-brand-500 text-white shadow' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800'"
+            >
+              إعدادات الواجهة
+            </button>
           </div>
 
           <div class="flex items-center gap-2">
@@ -602,7 +690,7 @@ const seedDatabase = async () => {
             </button>
 
             <button
-              v-else
+              v-else-if="activeTab === 'categories'"
               type="button"
               @click="openAddCategory"
               class="px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs sm:text-sm font-extrabold flex items-center gap-1.5 cursor-pointer shrink-0"
@@ -669,7 +757,7 @@ const seedDatabase = async () => {
         </div>
 
         <!-- Categories List -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div v-else-if="activeTab === 'categories'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div
             v-for="cat in categories"
             :key="cat.id"
@@ -696,6 +784,55 @@ const seedDatabase = async () => {
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- Hero Settings Tab -->
+        <div v-else class="max-w-3xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5">
+          <div>
+            <h2 class="font-black text-lg">إعدادات نصوص الواجهة الرئيسية</h2>
+            <p class="text-xs text-slate-500 mt-1">تحكم في الشارة والعنوان والوصف الذي يظهر فوق الكاروسيل للزوار.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold block mb-1">الشارة العلوية (عربي)</label>
+              <input v-model="formSettings.heroBadgeAr" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm" />
+            </div>
+            <div>
+              <label class="text-xs font-bold block mb-1">الشارة العلوية (إنجليزي)</label>
+              <input v-model="formSettings.heroBadgeEn" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm" />
+            </div>
+            <div>
+              <label class="text-xs font-bold block mb-1">العنوان الرئيسي (عربي)</label>
+              <input v-model="formSettings.heroTitleAr" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm" />
+            </div>
+            <div>
+              <label class="text-xs font-bold block mb-1">العنوان الرئيسي (إنجليزي)</label>
+              <input v-model="formSettings.heroTitleEn" type="text" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold block mb-1">الوصف التعريفي (عربي)</label>
+              <textarea v-model="formSettings.heroTaglineAr" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm"></textarea>
+            </div>
+            <div>
+              <label class="text-xs font-bold block mb-1">الوصف التعريفي (إنجليزي)</label>
+              <textarea v-model="formSettings.heroTaglineEn" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm"></textarea>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            :disabled="savingSettings"
+            @click="saveSettings"
+            class="px-6 py-3 rounded-2xl bg-brand-500 hover:bg-brand-600 text-white font-extrabold text-sm flex items-center gap-2 cursor-pointer"
+          >
+            <Loader2 v-if="savingSettings" class="w-4 h-4 animate-spin" />
+            <CheckCircle2 v-else class="w-4 h-4" />
+            <span>حفظ إعدادات الواجهة</span>
+          </button>
         </div>
       </main>
 
