@@ -21,7 +21,6 @@ const slides = computed(() => {
 })
 
 const activeSlideIndex = ref(0)
-const isPaused = ref(false)
 let carouselTimer: ReturnType<typeof setInterval> | null = null
 
 const currentSlideProduct = computed(() => {
@@ -33,10 +32,15 @@ const startCarousel = () => {
   if (carouselTimer) clearInterval(carouselTimer)
   if (!import.meta.client || slides.value.length <= 1) return
   carouselTimer = setInterval(() => {
-    if (!isPaused.value && slides.value.length > 1) {
+    if (slides.value.length > 1) {
       activeSlideIndex.value = (activeSlideIndex.value + 1) % slides.value.length
     }
-  }, 3000)
+  }, 3500)
+}
+
+const goToSlide = (idx: number) => {
+  activeSlideIndex.value = idx
+  startCarousel()
 }
 
 watch(() => slides.value.length, () => {
@@ -57,8 +61,6 @@ onUnmounted(() => {
   <section
     class="relative w-full overflow-hidden min-h-[320px] sm:min-h-[400px] md:min-h-[470px] flex flex-col items-center justify-center border-b border-slate-200/60 dark:border-slate-800/70"
     :class="slides.length > 0 ? 'bg-slate-950' : 'bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-950'"
-    @mouseenter="isPaused = true"
-    @mouseleave="isPaused = false"
     data-aos="fade-down"
   >
     <!-- Full-bleed background carousel (switches every 3 seconds) -->
@@ -128,7 +130,7 @@ onUnmounted(() => {
             v-for="(slide, idx) in slides"
             :key="`dot-${slide.id}`"
             type="button"
-            @click="activeSlideIndex = idx"
+            @click="goToSlide(idx)"
             class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
             :class="idx === (activeSlideIndex % slides.length) ? 'w-6 bg-white shadow-sm' : 'w-1.5 bg-white/45 hover:bg-white/75'"
             :aria-label="slide.name[lang]"
