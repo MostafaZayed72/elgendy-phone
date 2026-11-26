@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   unit_ar TEXT DEFAULT 'قطعة',
   unit_en TEXT DEFAULT 'piece',
   image TEXT NOT NULL,
+  images JSONB DEFAULT '[]'::jsonb,
   badge_ar TEXT,
   badge_en TEXT,
   colors JSONB DEFAULT '[]'::jsonb,
@@ -38,6 +39,9 @@ CREATE TABLE IF NOT EXISTS public.products (
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- الترقية التلقائية في حال كان الجدول منشأ مسبقاً
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 
 -- فهارس لتحسين سرعة الاستعلام
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category_slug);

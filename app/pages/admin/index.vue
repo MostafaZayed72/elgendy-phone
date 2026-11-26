@@ -43,6 +43,8 @@ const formProduct = reactive({
   originalPrice: '' as string | number,
   categorySlug: 'smartphones',
   image: '',
+  images: [] as string[],
+  newImageUrl: '',
   badgeAr: '',
   badgeEn: '',
   colorsText: '',
@@ -126,6 +128,8 @@ const openAddProduct = () => {
     originalPrice: '',
     categorySlug: categories.value[0]?.slug || 'smartphones',
     image: '',
+    images: [],
+    newImageUrl: '',
     badgeAr: '',
     badgeEn: '',
     colorsText: '',
@@ -148,6 +152,8 @@ const openEditProduct = (p: Product) => {
     originalPrice: p.originalPrice || '',
     categorySlug: p.categorySlug,
     image: p.image,
+    images: Array.isArray(p.images) && p.images.length > 0 ? [...p.images] : (p.image ? [p.image] : []),
+    newImageUrl: '',
     badgeAr: p.badge?.ar || '',
     badgeEn: p.badge?.en || '',
     colorsText: (p.colors || []).join('، '),
@@ -160,8 +166,8 @@ const openEditProduct = (p: Product) => {
 
 const handleImageUpload = async (event: Event) => {
   const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  if (!file) return
+  const files = input.files ? Array.from(input.files) : []
+  if (files.length === 0) return
 
   if (imageCount.value >= maxImages.value) {
     showToast(`تم الوصول للحد الأقصى (${maxImages.value} صورة)`, 'info')
@@ -169,22 +175,60 @@ const handleImageUpload = async (event: Event) => {
   }
 
   uploadingImage.value = true
+  let uploadedCount = 0
   try {
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
-      method: 'POST',
-      body: fd
-    })
-    if (res.url) {
-      formProduct.image = res.url
-      showToast('تم رفع الصورة بنجاح')
+    for (const file of files) {
+      if (imageCount.value + uploadedCount >= maxImages.value) {
+        showToast(`تم الوصول للحد الأقصى (${maxImages.value} صورة)`, 'info')
+        break
+      }
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await $fetch<{ success: boolean; url: string }>('/api/upload', {
+        method: 'POST',
+        body: fd
+      })
+      if (res.url) {
+        if (!formProduct.images.includes(res.url)) {
+          formProduct.images.push(res.url)
+        }
+        if (!formProduct.image) {
+          formProduct.image = res.url
+        }
+        uploadedCount++
+      }
+    }
+    if (uploadedCount > 0) {
+      showToast(uploadedCount > 1 ? `تم رفع ${uploadedCount} صور بنجاح` : 'تم رفع الصورة بنجاح')
     }
   } catch (err: any) {
     showToast(err?.data?.statusMessage || err?.statusMessage || 'فشل رفع الصورة', 'info', 4000)
   } finally {
     uploadingImage.value = false
     input.value = ''
+  }
+}
+
+const addImageByUrl = () => {
+  const url = formProduct.newImageUrl.trim()
+  if (!url) return
+  if (!formProduct.images.includes(url)) {
+    formProduct.images.push(url)
+  }
+  if (!formProduct.image) {
+    formProduct.image = url
+  }
+  formProduct.newImageUrl = ''
+}
+
+const setMainImage = (url: string) => {
+  formProduct.image = url
+}
+
+const removeGalleryImage = (url: string) => {
+  formProduct.images = formProduct.images.filter(i => i !== url)
+  if (formProduct.image === url) {
+    formProduct.image = formProduct.images[0] || ''
   }
 }
 
@@ -212,7 +256,8 @@ const saveProduct = async () => {
       price: Number(formProduct.price) || 0,
       originalPrice: formProduct.originalPrice ? Number(formProduct.originalPrice) : undefined,
       unit: { ar: 'جهاز', en: 'device' },
-      image: formProduct.image.trim() || '/images/products/iphone-13.jpg',
+      image: formProduct.image.trim() || formProduct.images[0] || '/images/products/iphone-13.jpg',
+      images: formProduct.images.length > 0 ? formProduct.images : (formProduct.image.trim() ? [formProduct.image.trim()] : []),
       badge: formProduct.badgeAr.trim()
         ? { ar: formProduct.badgeAr.trim(), en: formProduct.badgeEn.trim() || formProduct.badgeAr.trim() }
         : undefined,
@@ -608,26 +653,62 @@ const seedDatabase = async () => {
               </button>
             </div>
 
-            <!-- Cloudinary Upload Box -->
-            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-slate-300 dark:border-slate-700 flex flex-col sm:flex-row items-center gap-4">
-              <img
-                v-if="formProduct.image"
-                :src="formProduct.image"
-                class="w-20 h-20 rounded-xl object-cover bg-white shrink-0"
-              />
-              <div class="flex-1 space-y-2 w-full">
+            <!-- Multi-Image Gallery Upload Box -->
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-dashed border-slate-300 dark:border-slate-700 space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
                 <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-extrabold cursor-pointer">
                   <Loader2 v-if="uploadingImage" class="w-4 h-4 animate-spin" />
                   <Upload v-else class="w-4 h-4" />
-                  <span>{{ uploadingImage ? 'جاري رفع الصورة...' : 'رفع صورة من جهازك' }}</span>
-                  <input type="file" accept="image/*" class="hidden" @change="handleImageUpload" :disabled="uploadingImage" />
+                  <span>{{ uploadingImage ? 'جاري رفع الصور...' : 'رفع صور من جهازك (يمكنك اختيار أكثر من صورة)' }}</span>
+                  <input type="file" accept="image/*" multiple class="hidden" @change="handleImageUpload" :disabled="uploadingImage" />
                 </label>
+                <span class="text-[11px] font-bold text-slate-500">
+                  {{ formProduct.images.length }} صور مضافة
+                </span>
+              </div>
+
+              <!-- Gallery Thumbnails -->
+              <div v-if="formProduct.images.length > 0" class="flex flex-wrap gap-2.5">
+                <div
+                  v-for="(imgUrl, idx) in formProduct.images"
+                  :key="`${imgUrl}-${idx}`"
+                  class="relative group w-20 h-20 rounded-xl overflow-hidden border-2 bg-white dark:bg-slate-900"
+                  :class="formProduct.image === imgUrl ? 'border-brand-500 ring-2 ring-brand-500/30' : 'border-slate-200 dark:border-slate-700'"
+                >
+                  <img :src="imgUrl" class="w-full h-full object-cover cursor-pointer" @click="setMainImage(imgUrl)" />
+                  <span
+                    v-if="formProduct.image === imgUrl"
+                    class="absolute bottom-1 inset-x-1 text-center py-0.5 rounded bg-brand-500 text-white text-[9px] font-black pointer-events-none"
+                  >
+                    رئيسية
+                  </span>
+                  <button
+                    type="button"
+                    @click="removeGalleryImage(imgUrl)"
+                    class="absolute top-1 end-1 w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow cursor-pointer opacity-90 hover:opacity-100"
+                    title="حذف الصورة"
+                  >
+                    <X class="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              <!-- Add by URL -->
+              <div class="flex gap-2">
                 <input
-                  v-model="formProduct.image"
+                  v-model="formProduct.newImageUrl"
                   type="text"
-                  placeholder="أو الصق رابط الصورة مباشرة هنا"
-                  class="w-full px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"
+                  placeholder="أو الصق رابط صورة إضافية هنا"
+                  class="flex-1 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs"
+                  @keyup.enter.prevent="addImageByUrl"
                 />
+                <button
+                  type="button"
+                  @click="addImageByUrl"
+                  class="px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-700 text-white text-xs font-bold cursor-pointer"
+                >
+                  إضافة
+                </button>
               </div>
             </div>
 

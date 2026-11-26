@@ -37,6 +37,7 @@ export default defineEventHandler(async (event) => {
           originalPrice: p.original_price ? Number(p.original_price) : undefined,
           unit: { ar: p.unit_ar || 'قطعة', en: p.unit_en || 'piece' },
           image: p.image,
+          images: Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []),
           badge: p.badge_ar ? { ar: p.badge_ar, en: p.badge_en || p.badge_ar } : undefined,
           colors: Array.isArray(p.colors) ? p.colors : [],
           options: Array.isArray(p.options) ? p.options : [],

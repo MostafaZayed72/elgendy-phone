@@ -19,12 +19,19 @@ export function getServerSupabase(): SupabaseClient | null {
 export async function getUploadedImagesCount(supabase: SupabaseClient | null): Promise<number> {
   if (!supabase) return 0
   try {
-    const { data, error } = await supabase.from('products').select('image')
+    const { data, error } = await supabase.from('products').select('image, images')
     if (error || !data) return 0
     const uniqueImages = new Set<string>()
     for (const row of data) {
       if (row.image && typeof row.image === 'string' && row.image.trim()) {
         uniqueImages.add(row.image.trim())
+      }
+      if (Array.isArray(row.images)) {
+        for (const img of row.images) {
+          if (img && typeof img === 'string' && img.trim()) {
+            uniqueImages.add(img.trim())
+          }
+        }
       }
     }
     return uniqueImages.size

@@ -26,6 +26,7 @@ export interface Product {
   originalPrice?: number
   unit: LocalizedText
   image: string
+  images?: string[]
   categorySlug: string
   badge?: LocalizedText
   colors?: string[]

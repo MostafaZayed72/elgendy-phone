@@ -11,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const { locale, t } = useI18n()
+const localePath = useLocalePath()
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'ar'))
 const isRtl = computed(() => lang.value === 'ar')
 const isTouchPaused = ref(false)
@@ -82,12 +83,11 @@ const animationDuration = computed(() => {
           :key="`group-${groupCopy}`"
           class="flex shrink-0 gap-3 sm:gap-4 pr-3 sm:pr-4"
         >
-          <button
+          <NuxtLink
             v-for="(product, idx) in baseGroupProducts"
             :key="`${groupCopy}-${product.id}-${idx}`"
-            type="button"
+            :to="localePath(`/products/${product.id}`)"
             :dir="isRtl ? 'rtl' : 'ltr'"
-            @click="emit('select', product)"
             class="w-[148px] sm:w-[184px] shrink-0 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col text-start cursor-pointer"
           >
             <div class="p-1.5 pb-0">
@@ -122,7 +122,7 @@ const animationDuration = computed(() => {
                 </span>
               </div>
             </div>
-          </button>
+          </NuxtLink>
         </div>
       </div>
     </div>

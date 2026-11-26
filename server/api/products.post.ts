@@ -38,7 +38,11 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const payload = {
+  const galleryImages = Array.isArray(p.images) && p.images.length > 0
+    ? p.images.filter(Boolean)
+    : (p.image ? [p.image] : ['/images/products/iphone-13.jpg'])
+
+  const payload: Record<string, any> = {
     id: productId,
     category_slug: p.categorySlug || 'smartphones',
     name_ar: p.name.ar,
@@ -49,7 +53,8 @@ export default defineEventHandler(async (event) => {
     original_price: p.originalPrice ? Number(p.originalPrice) : null,
     unit_ar: p.unit?.ar || 'قطعة',
     unit_en: p.unit?.en || 'piece',
-    image: p.image || '/images/products/iphone-13.jpg',
+    image: p.image || galleryImages[0],
+    images: galleryImages,
     badge_ar: p.badge?.ar || null,
     badge_en: p.badge?.en || p.badge?.ar || null,
     colors: Array.isArray(p.colors) ? p.colors : [],
@@ -60,7 +65,12 @@ export default defineEventHandler(async (event) => {
     updated_at: new Date().toISOString()
   }
 
-  const { error } = await supabase.from('products').upsert(payload)
+  let { error } = await supabase.from('products').upsert(payload)
+  if (error && error.message?.includes('images')) {
+    delete payload.images
+    const retry = await supabase.from('products').upsert(payload)
+    error = retry.error
+  }
   if (error) {
     throw createError({
       statusCode: 500,

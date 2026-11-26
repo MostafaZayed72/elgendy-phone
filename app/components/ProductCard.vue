@@ -12,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const { locale, t } = useI18n()
+const localePath = useLocalePath()
 const { addToCart } = useCart()
 const { showToast } = useToast()
 
@@ -23,6 +24,7 @@ const discountPercent = computed(() => {
 })
 
 const handleQuickAdd = (e: Event) => {
+  e.preventDefault()
   e.stopPropagation()
   const defaultOption = props.product.options?.[0]
   const defaultColor = props.product.colors?.[0]
@@ -34,8 +36,8 @@ const handleQuickAdd = (e: Event) => {
 </script>
 
 <template>
-  <article
-    @click="emit('select', product)"
+  <NuxtLink
+    :to="localePath(`/products/${product.id}`)"
     class="group relative flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-brand-500/40 dark:hover:border-brand-400/40 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer"
     data-aos="fade-up"
     :data-aos-delay="Math.min((index || 0) * 50, 250)"
@@ -113,5 +115,5 @@ const handleQuickAdd = (e: Event) => {
         <span>{{ product.isOutOfStock ? t('catalog.outOfStock') : t('catalog.addToCart') }}</span>
       </button>
     </div>
-  </article>
+  </NuxtLink>
 </template>

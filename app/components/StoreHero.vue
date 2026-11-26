@@ -12,6 +12,7 @@ const emit = defineEmits<{
 }>()
 
 const { locale, t } = useI18n()
+const localePath = useLocalePath()
 const lang = computed(() => (locale.value === 'en' ? 'en' : 'ar'))
 
 const slides = computed(() => {
@@ -109,9 +110,8 @@ onUnmounted(() => {
 
       <!-- Current Slide Product Pill & Carousel Indicators -->
       <div v-if="slides.length > 0 && currentSlideProduct" class="pt-2 flex flex-col items-center gap-2.5">
-        <button
-          type="button"
-          @click="emit('select', currentSlideProduct)"
+        <NuxtLink
+          :to="localePath(`/products/${currentSlideProduct.id}`)"
           class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-950/55 hover:bg-slate-950/75 backdrop-blur-md border border-white/25 text-white text-xs font-bold transition-all shadow-md max-w-[90vw] sm:max-w-md cursor-pointer"
         >
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
@@ -120,7 +120,7 @@ onUnmounted(() => {
             {{ currentSlideProduct.price.toLocaleString('en-US') }} {{ t('catalog.egp') }}
           </span>
           <ArrowUpRight class="w-3.5 h-3.5 shrink-0 opacity-85" />
-        </button>
+        </NuxtLink>
 
         <div v-if="slides.length > 1" class="flex items-center justify-center gap-1.5">
           <button
