@@ -895,7 +895,7 @@ const saveSettings = async () => {
             <div class="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h3 class="font-black text-base">البانر الثابت أسفل الهيرو</h3>
-                <p class="text-xs text-slate-500 mt-0.5">ارفع صورة ثابتة لعرضها أسفل الكاروسيل ويمكنك إظهارها أو إخفاؤها في أي وقت.</p>
+                <p class="text-xs text-slate-500 mt-0.5">المقاس الموحد: <span class="font-black text-brand-500 dir-ltr inline-block">1600 × 500</span> بكسل (يظهر كاملاً على الكمبيوتر والموبايل بدون قص).</p>
               </div>
               <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 cursor-pointer text-xs font-extrabold">
                 <input v-model="formSettings.promoBannerEnabled" type="checkbox" class="rounded accent-brand-500" />
@@ -908,7 +908,7 @@ const saveSettings = async () => {
                 v-if="formSettings.promoBannerImage"
                 :src="formSettings.promoBannerImage"
                 alt="Promo Banner"
-                class="w-full max-h-48 object-cover rounded-2xl border border-slate-200 dark:border-slate-700"
+                class="w-full aspect-[16/5] object-cover rounded-2xl border border-slate-200 dark:border-slate-700"
               />
               <div class="flex flex-wrap items-center gap-3">
                 <label class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-extrabold cursor-pointer">

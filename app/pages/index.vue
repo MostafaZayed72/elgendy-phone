@@ -179,7 +179,7 @@ const getCategoryIcon = (icon: string) => {
         <img
           :src="storeData.settings.promoBannerImage"
           :alt="t('store.name')"
-          class="w-full max-h-[240px] sm:max-h-[360px] md:max-h-[420px] object-cover object-center"
+          class="w-full aspect-[16/5] object-cover object-center"
         />
       </a>
       <div
@@ -189,7 +189,7 @@ const getCategoryIcon = (icon: string) => {
         <img
           :src="storeData.settings.promoBannerImage"
           :alt="t('store.name')"
-          class="w-full max-h-[240px] sm:max-h-[360px] md:max-h-[420px] object-cover object-center"
+          class="w-full aspect-[16/5] object-cover object-center"
         />
       </div>
     </section>
