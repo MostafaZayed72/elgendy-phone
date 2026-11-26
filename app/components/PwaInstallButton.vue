@@ -35,7 +35,7 @@ onMounted(() => {
         <button
           type="button"
           @click="triggerInstall"
-          class="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-2xl bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 shadow-xl hover:shadow-2xl border border-slate-700/60 dark:border-slate-200 backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
+          class="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 shadow-xl hover:shadow-2xl border border-slate-700/60 dark:border-slate-200 backdrop-blur-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap"
           :title="isAr ? 'تثبيت التطبيق على جهازك' : 'Install App'"
         >
           <span class="relative flex h-2 w-2 shrink-0">

@@ -308,8 +308,8 @@ const getCategoryIcon = (icon: string) => {
     <div
       v-if="categories.length > 0"
       ref="filterBtnRef"
-      class="fixed z-40 touch-none select-none"
-      :class="filterBtnPos ? '' : 'bottom-20 start-4 sm:start-6'"
+      class="fixed z-50 touch-none select-none"
+      :class="filterBtnPos ? '' : 'bottom-24 start-4 sm:start-6'"
       :style="filterBtnPos ? { left: `${filterBtnPos.x}px`, top: `${filterBtnPos.y}px` } : undefined"
     >
       <button
