@@ -733,14 +733,6 @@ const saveSettings = async () => {
             >
               إعدادات الواجهة
             </button>
-            <button
-              type="button"
-              @click="activeTab = 'settings'"
-              class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer"
-              :class="activeTab === 'settings' ? 'bg-brand-500 text-white shadow' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800'"
-            >
-              إعدادات الواجهة
-            </button>
           </div>
 
           <div class="flex items-center gap-2">
@@ -862,7 +854,7 @@ const saveSettings = async () => {
         </div>
 
         <!-- Hero Settings Tab -->
-        <div v-else class="max-w-3xl rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5">
+        <div v-else class="w-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5">
           <div>
             <h2 class="font-black text-lg">إعدادات نصوص الواجهة الرئيسية</h2>
             <p class="text-xs text-slate-500 mt-1">تحكم في الشارة والعنوان والوصف الذي يظهر فوق الكاروسيل للزوار.</p>
