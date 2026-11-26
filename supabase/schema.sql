@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   color_images JSONB DEFAULT '{}'::jsonb,
   rams JSONB DEFAULT '[]'::jsonb,
   options JSONB DEFAULT '[]'::jsonb,
+  variant_prices JSONB DEFAULT '{}'::jsonb,
   is_hidden BOOLEAN DEFAULT false,
   is_out_of_stock BOOLEAN DEFAULT false,
   featured BOOLEAN DEFAULT false,
@@ -60,6 +61,7 @@ ALTER TABLE public.categories ADD COLUMN IF NOT EXISTS image TEXT;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT '[]'::jsonb;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS color_images JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.products ADD COLUMN IF NOT EXISTS rams JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS variant_prices JSONB DEFAULT '{}'::jsonb;
 
 -- فهارس لتحسين سرعة الاستعلام
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category_slug);

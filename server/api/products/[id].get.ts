@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
           colorImages: p.color_images && typeof p.color_images === 'object' ? p.color_images : {},
           rams: Array.isArray(p.rams) ? p.rams : [],
           options: Array.isArray(p.options) ? p.options : [],
+          variantPrices: p.variant_prices && typeof p.variant_prices === 'object' ? p.variant_prices : {},
           isHidden: Boolean(p.is_hidden),
           isOutOfStock: Boolean(p.is_out_of_stock),
           featured: Boolean(p.featured)

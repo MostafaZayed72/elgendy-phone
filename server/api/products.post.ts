@@ -61,6 +61,7 @@ export default defineEventHandler(async (event) => {
     color_images: p.colorImages && typeof p.colorImages === 'object' ? p.colorImages : {},
     rams: Array.isArray(p.rams) ? p.rams : [],
     options: Array.isArray(p.options) ? p.options : [],
+    variant_prices: p.variantPrices && typeof p.variantPrices === 'object' ? p.variantPrices : {},
     is_hidden: Boolean(p.isHidden),
     is_out_of_stock: Boolean(p.isOutOfStock),
     featured: Boolean(p.featured),
@@ -68,8 +69,9 @@ export default defineEventHandler(async (event) => {
   }
 
   let { error } = await supabase.from('products').upsert(payload)
-  while (error && (error.message?.includes('images') || error.message?.includes('color_images') || error.message?.includes('rams'))) {
-    if (error.message.includes('rams')) delete payload.rams
+  while (error && (error.message?.includes('images') || error.message?.includes('color_images') || error.message?.includes('rams') || error.message?.includes('variant_prices'))) {
+    if (error.message.includes('variant_prices')) delete payload.variant_prices
+    else if (error.message.includes('rams')) delete payload.rams
     else if (error.message.includes('color_images')) delete payload.color_images
     else if (error.message.includes('images')) delete payload.images
     const retry = await supabase.from('products').upsert(payload)

@@ -62,6 +62,7 @@ const formProduct = reactive({
   colorImages: {} as Record<string, string>,
   ramsText: '',
   optionsText: '',
+  variantPrices: {} as Record<string, number | string>,
   isHidden: false,
   isOutOfStock: false
 })
@@ -150,6 +151,29 @@ const filteredProducts = computed(() => {
 const parsedColors = computed(() =>
   formProduct.colorsText.split(/[,،]/).map(s => s.trim()).filter(Boolean)
 )
+const parsedRams = computed(() =>
+  formProduct.ramsText.split(/[,،|+]/).map(s => s.trim()).filter(Boolean)
+)
+const parsedOptions = computed(() =>
+  formProduct.optionsText.split(/[,،|+]/).map(s => s.trim()).filter(Boolean)
+)
+
+const variantCombinations = computed<string[]>(() => {
+  const rams = parsedRams.value
+  const opts = parsedOptions.value
+  if (rams.length > 0 && opts.length > 0) {
+    const list: string[] = []
+    for (const r of rams) {
+      for (const o of opts) {
+        list.push(`${r} / ${o}`)
+      }
+    }
+    return list
+  }
+  if (opts.length > 0) return opts
+  if (rams.length > 0) return rams
+  return []
+})
 
 const openAddProduct = () => {
   editingProduct.value = null
@@ -171,6 +195,7 @@ const openAddProduct = () => {
     colorImages: {},
     ramsText: '',
     optionsText: '',
+    variantPrices: {},
     isHidden: false,
     isOutOfStock: false
   })
@@ -197,6 +222,7 @@ const openEditProduct = (p: Product) => {
     colorImages: p.colorImages ? { ...p.colorImages } : {},
     ramsText: (p.rams || []).join('، '),
     optionsText: (p.options || []).join('، '),
+    variantPrices: p.variantPrices ? { ...p.variantPrices } : {},
     isHidden: Boolean(p.isHidden),
     isOutOfStock: Boolean(p.isOutOfStock)
   })
@@ -280,7 +306,15 @@ const saveProduct = async () => {
   savingProduct.value = true
   try {
     const splitList = (txt: string) =>
-      txt.split(/[,،]/).map(s => s.trim()).filter(Boolean)
+      txt.split(/[,،|+]/).map(s => s.trim()).filter(Boolean)
+
+    const cleanVariantPrices: Record<string, number> = {}
+    for (const key of variantCombinations.value) {
+      const val = Number(formProduct.variantPrices[key])
+      if (val > 0) {
+        cleanVariantPrices[key] = val
+      }
+    }
 
     const cleanColorImages: Record<string, string> = {}
     const activeColors = splitList(formProduct.colorsText)
@@ -313,6 +347,7 @@ const saveProduct = async () => {
       colorImages: cleanColorImages,
       rams: splitList(formProduct.ramsText),
       options: splitList(formProduct.optionsText),
+      variantPrices: cleanVariantPrices,
       isHidden: formProduct.isHidden,
       isOutOfStock: formProduct.isOutOfStock
     }
@@ -973,12 +1008,35 @@ const saveSettings = async () => {
                 <input v-model="formProduct.colorsText" type="text" placeholder="أسود، أبيض، أزرق" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
               </div>
               <div>
-                <label class="text-xs font-bold block mb-1">الرامات RAM (افصل بفاصلة)</label>
-                <input v-model="formProduct.ramsText" type="text" placeholder="4GB, 6GB, 8GB, 12GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
+                <label class="text-xs font-bold block mb-1">الرامات RAM (افصل بفاصلة ، مثل: 6GB, 8GB)</label>
+                <input v-model="formProduct.ramsText" type="text" placeholder="6GB, 8GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
               </div>
               <div>
-                <label class="text-xs font-bold block mb-1">المساحات / الخيارات (افصل بفاصلة)</label>
-                <input v-model="formProduct.optionsText" type="text" placeholder="128GB, 256GB, 512GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
+                <label class="text-xs font-bold block mb-1">المساحات / الخيارات (افصل بفاصلة ، مثل: 128GB, 256GB)</label>
+                <input v-model="formProduct.optionsText" type="text" placeholder="128GB, 256GB" class="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm" />
+              </div>
+            </div>
+
+            <!-- Variant Prices Matrix (RAM / Storage) -->
+            <div v-if="variantCombinations.length > 0" class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200">أسعار النسخ حسب الرام والمساحة (اختياري)</span>
+                <span class="text-[11px] text-slate-400">اتركه فارغاً لاستخدام السعر الأساسي</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div
+                  v-for="combo in variantCombinations"
+                  :key="`vp-${combo}`"
+                  class="flex items-center justify-between gap-2 p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-slate-700/70"
+                >
+                  <span class="text-xs font-extrabold text-slate-800 dark:text-slate-100 dir-ltr">{{ combo }}</span>
+                  <input
+                    v-model="formProduct.variantPrices[combo]"
+                    type="number"
+                    :placeholder="String(formProduct.price || 0)"
+                    class="w-28 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-center"
+                  />
+                </div>
               </div>
             </div>
 

@@ -34,6 +34,7 @@ export interface Product {
   colorImages?: Record<string, string>
   rams?: string[]
   options?: string[]
+  variantPrices?: Record<string, number>
   isHidden?: boolean
   isOutOfStock?: boolean
   featured?: boolean

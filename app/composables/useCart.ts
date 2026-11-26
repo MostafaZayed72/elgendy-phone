@@ -88,7 +88,8 @@ export function useCart() {
     color?: string,
     notes?: string,
     selectedImage?: string,
-    selectedRam?: string
+    selectedRam?: string,
+    customPrice?: number
   ) => {
     if (product.isOutOfStock) return false
     loadFromStorage()
@@ -96,6 +97,7 @@ export function useCart() {
     const cleanOption = selectedOption?.trim() || ''
     const cleanRam = selectedRam?.trim() || ''
     const cleanColor = color?.trim() || ''
+    const unitPrice = typeof customPrice === 'number' && customPrice > 0 ? customPrice : product.price
     const keyParts = [product.id]
     if (cleanColor) keyParts.push(`col-${cleanColor}`)
     if (cleanRam) keyParts.push(`ram-${cleanRam}`)
@@ -105,6 +107,7 @@ export function useCart() {
     const existing = items.value.find(i => i.id === itemId)
     if (existing) {
       existing.quantity += quantity
+      existing.price = unitPrice
       if (notes?.trim()) existing.notes = notes.trim()
       if (selectedImage) existing.selectedImage = selectedImage
     } else {
@@ -112,7 +115,7 @@ export function useCart() {
         id: itemId,
         product,
         quantity,
-        price: product.price,
+        price: unitPrice,
         selectedOption: cleanOption || undefined,
         selectedRam: cleanRam || undefined,
         color: cleanColor || undefined,

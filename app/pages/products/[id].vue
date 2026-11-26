@@ -77,14 +77,32 @@ const activeImage = computed(() => {
   return galleryImages.value[activeImageIndex.value] || product.value?.image || ''
 })
 
+const activePrice = computed(() => {
+  if (!product.value) return 0
+  const vp = product.value.variantPrices
+  if (vp) {
+    if (selectedRam.value && selectedOption.value) {
+      const comboKey = `${selectedRam.value} / ${selectedOption.value}`
+      if (vp[comboKey] && Number(vp[comboKey]) > 0) return Number(vp[comboKey])
+    }
+    if (selectedOption.value && vp[selectedOption.value] && Number(vp[selectedOption.value]) > 0) {
+      return Number(vp[selectedOption.value])
+    }
+    if (selectedRam.value && vp[selectedRam.value] && Number(vp[selectedRam.value]) > 0) {
+      return Number(vp[selectedRam.value])
+    }
+  }
+  return product.value.price
+})
+
 const discountPercent = computed(() => {
-  if (!product.value?.originalPrice || product.value.originalPrice <= product.value.price) return 0
-  return Math.round(((product.value.originalPrice - product.value.price) / product.value.originalPrice) * 100)
+  if (!product.value?.originalPrice || product.value.originalPrice <= activePrice.value) return 0
+  return Math.round(((product.value.originalPrice - activePrice.value) / product.value.originalPrice) * 100)
 })
 
 const savingsAmount = computed(() => {
-  if (!product.value?.originalPrice || product.value.originalPrice <= product.value.price) return 0
-  return product.value.originalPrice - product.value.price
+  if (!product.value?.originalPrice || product.value.originalPrice <= activePrice.value) return 0
+  return product.value.originalPrice - activePrice.value
 })
 
 useSeoMeta({
@@ -103,7 +121,8 @@ const handleAddToCart = () => {
     selectedColor.value || undefined,
     notes.value || undefined,
     colorImg || activeImage.value || undefined,
-    selectedRam.value || undefined
+    selectedRam.value || undefined,
+    activePrice.value
   )
   if (added) {
     showToast(t('catalog.addedToCart'))
@@ -116,7 +135,7 @@ const directWhatsappUrl = computed(() => {
     isAr.value ? 'مرحباً متجر الجندي، أود طلب المنتج التالي:' : 'Hello EL-GENDY Store, I would like to order:',
     `*${product.value.name[lang.value]}*`,
     `${isAr.value ? 'الكمية' : 'Qty'}: ${quantity.value}`,
-    `${isAr.value ? 'السعر' : 'Price'}: ${(product.value.price * quantity.value).toLocaleString('en-US')} ${t('catalog.egp')}`
+    `${isAr.value ? 'السعر' : 'Price'}: ${(activePrice.value * quantity.value).toLocaleString('en-US')} ${t('catalog.egp')}`
   ]
   if (selectedColor.value) lines.push(`${t('catalog.color')}: ${selectedColor.value}`)
   if (selectedRam.value) lines.push(`${t('catalog.ram')}: ${selectedRam.value}`)
@@ -312,13 +331,13 @@ const nextImage = () => {
           <div class="p-4 sm:p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
             <div class="flex flex-wrap items-baseline gap-3">
               <span class="text-3xl sm:text-4xl font-black text-brand-600 dark:text-brand-400">
-                {{ product.price.toLocaleString('en-US') }}
+                {{ activePrice.toLocaleString('en-US') }}
               </span>
               <span class="text-sm font-bold text-slate-500 dark:text-slate-400">
                 {{ t('catalog.egp') }} / {{ product.unit[lang] }}
               </span>
               <span
-                v-if="product.originalPrice && product.originalPrice > product.price"
+                v-if="product.originalPrice && product.originalPrice > activePrice"
                 class="text-base text-slate-400 line-through font-bold"
               >
                 {{ product.originalPrice.toLocaleString('en-US') }} {{ t('catalog.egp') }}
