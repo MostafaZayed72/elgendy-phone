@@ -20,6 +20,15 @@ const products = computed(() => storeData.value?.products || storeProducts)
 const activeCategory = ref<string>('all')
 const searchQuery = ref<string>('')
 const selectedProduct = ref<Product | null>(null)
+const isFilterSheetOpen = ref(false)
+
+const selectCategoryAndScroll = (slug: string) => {
+  activeCategory.value = slug
+  isFilterSheetOpen.value = false
+  if (import.meta.client) {
+    document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 
 const latestProducts = computed(() => products.value.slice(0, 10))
 
@@ -161,5 +170,107 @@ const getCategoryIcon = (icon: string) => {
 
     <StoreFooter />
     <ProductModal :product="selectedProduct" @close="selectedProduct = null" />
+
+    <!-- Floating Category Filter Button (above PWA Install button) -->
+    <div v-if="categories.length > 0" class="fixed bottom-20 start-4 sm:start-6 z-40">
+      <button
+        type="button"
+        @click="isFilterSheetOpen = true"
+        class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-500 hover:bg-brand-600 text-white shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer ring-4 ring-white/80 dark:ring-slate-900/80"
+        :title="lang === 'ar' ? 'تصفية حسب القسم' : 'Filter by Category'"
+        :aria-label="lang === 'ar' ? 'تصفية حسب القسم' : 'Filter by Category'"
+      >
+        <svg class="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </svg>
+        <span
+          v-if="activeCategory !== 'all'"
+          class="absolute -top-0.5 -end-0.5 w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-white dark:border-slate-900 animate-pulse"
+        />
+      </button>
+    </div>
+
+    <!-- Category Filter Sheet Modal -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="isFilterSheetOpen"
+          class="fixed inset-0 z-[70] bg-black/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4"
+          @click.self="isFilterSheetOpen = false"
+        >
+          <div
+            :dir="lang === 'ar' ? 'rtl' : 'ltr'"
+            class="w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 p-5 shadow-2xl space-y-4 max-h-[80vh] flex flex-col"
+          >
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div class="flex items-center gap-2.5">
+                <span class="w-9 h-9 rounded-xl bg-brand-500 text-white flex items-center justify-center shadow-sm">
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                  </svg>
+                </span>
+                <div>
+                  <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+                    {{ lang === 'ar' ? 'تصفح حسب القسم' : 'Browse by Category' }}
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                    {{ lang === 'ar' ? 'اختر القسم لعرض منتجاته مباشرة' : 'Select a category to filter products' }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="isFilterSheetOpen = false"
+                class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center transition cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div class="overflow-y-auto space-y-2 pe-1">
+              <button
+                type="button"
+                @click="selectCategoryAndScroll('all')"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-black transition-all cursor-pointer border"
+                :class="activeCategory === 'all'
+                  ? 'bg-brand-500 text-white border-transparent shadow-md'
+                  : 'bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800'"
+              >
+                <div class="flex items-center gap-2.5">
+                  <LayoutGrid class="w-5 h-5" />
+                  <span>{{ lang === 'ar' ? 'كل الأقسام والمنتجات' : 'All Categories' }}</span>
+                </div>
+                <span v-if="activeCategory === 'all'">✓</span>
+              </button>
+
+              <button
+                v-for="cat in categories"
+                :key="`sheet-${cat.id}`"
+                type="button"
+                @click="selectCategoryAndScroll(cat.slug)"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all cursor-pointer border"
+                :class="activeCategory === cat.slug
+                  ? 'bg-brand-500 text-white border-transparent shadow-md'
+                  : 'bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800'"
+              >
+                <div class="flex items-center gap-2.5">
+                  <img v-if="cat.image" :src="cat.image" :alt="cat.name[lang]" class="w-7 h-7 rounded-xl object-cover bg-white/90 shrink-0" />
+                  <component v-else :is="getCategoryIcon(cat.icon)" class="w-5 h-5 shrink-0" />
+                  <span>{{ cat.name[lang] }}</span>
+                </div>
+                <span v-if="activeCategory === cat.slug">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
