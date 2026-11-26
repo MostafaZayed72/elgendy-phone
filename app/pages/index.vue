@@ -189,18 +189,23 @@ const getCategoryIcon = (icon: string) => {
         </div>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" data-aos="fade-up" data-aos-delay="80">
+      <!-- Category 3D Cards Strip -->
+      <div class="flex items-stretch gap-3 overflow-x-auto pb-3 pt-1 no-scrollbar" data-aos="fade-up" data-aos-delay="80">
         <button
           type="button"
           @click="activeCategory = 'all'"
-          class="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold border transition-all cursor-pointer"
+          class="group shrink-0 min-w-[96px] sm:min-w-[116px] flex flex-col items-center justify-center gap-2 p-2.5 sm:p-3 rounded-3xl border transition-all duration-300 cursor-pointer"
           :class="activeCategory === 'all'
-            ? 'bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20'
-            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-brand-500/40'"
+            ? 'bg-gradient-to-b from-brand-500 to-brand-600 text-white border-brand-500 shadow-lg shadow-brand-500/30 -translate-y-0.5'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-brand-500/40 hover:-translate-y-0.5 shadow-sm'"
         >
-          <LayoutGrid class="w-4 h-4" />
-          <span>{{ t('nav.allCategories') }}</span>
+          <div
+            class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5 shadow-[0_8px_18px_-4px_rgba(30,107,184,0.35),inset_0_2px_4px_rgba(255,255,255,0.65)]"
+            :class="activeCategory === 'all' ? 'bg-white/20 text-white' : 'bg-gradient-to-br from-brand-50 to-sky-100 dark:from-slate-800 dark:to-slate-700 text-brand-500 dark:text-brand-400'"
+          >
+            <LayoutGrid class="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-sm" />
+          </div>
+          <span class="text-[11px] sm:text-xs font-extrabold text-center leading-tight line-clamp-2">{{ t('nav.allCategories') }}</span>
         </button>
 
         <button
@@ -208,19 +213,23 @@ const getCategoryIcon = (icon: string) => {
           :key="cat.id"
           type="button"
           @click="activeCategory = cat.slug"
-          class="shrink-0 inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-2xl text-xs sm:text-sm font-extrabold border transition-all cursor-pointer"
+          class="group shrink-0 min-w-[96px] sm:min-w-[116px] flex flex-col items-center justify-center gap-2 p-2.5 sm:p-3 rounded-3xl border transition-all duration-300 cursor-pointer"
           :class="activeCategory === cat.slug
-            ? 'bg-brand-500 text-white border-brand-500 shadow-md shadow-brand-500/20'
-            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:border-brand-500/40'"
+            ? 'bg-gradient-to-b from-brand-500 to-brand-600 text-white border-brand-500 shadow-lg shadow-brand-500/30 -translate-y-0.5'
+            : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-brand-500/40 hover:-translate-y-0.5 shadow-sm'"
         >
-          <img
-            v-if="cat.image"
-            :src="cat.image"
-            :alt="cat.name[lang]"
-            class="w-7 h-7 rounded-xl object-cover shrink-0 bg-white/90 shadow-2xs"
-          />
-          <component v-else :is="getCategoryIcon(cat.icon)" class="w-4 h-4" />
-          <span>{{ cat.name[lang] }}</span>
+          <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shrink-0 bg-gradient-to-br from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 p-0.5 transition-transform duration-300 group-hover:scale-105 group-hover:-translate-y-0.5 shadow-[0_10px_20px_-5px_rgba(15,23,42,0.28),inset_0_2px_4px_rgba(255,255,255,0.85)]">
+            <img
+              v-if="cat.image"
+              :src="cat.image"
+              :alt="cat.name[lang]"
+              class="w-full h-full rounded-[14px] object-cover"
+            />
+            <div v-else class="w-full h-full flex items-center justify-center text-brand-500">
+              <component :is="getCategoryIcon(cat.icon)" class="w-7 h-7 sm:w-8 sm:h-8 drop-shadow" />
+            </div>
+          </div>
+          <span class="text-[11px] sm:text-xs font-extrabold text-center leading-tight line-clamp-2 max-w-[100px]">{{ cat.name[lang] }}</span>
         </button>
       </div>
 
@@ -362,9 +371,13 @@ const getCategoryIcon = (icon: string) => {
                   ? 'bg-brand-500 text-white border-transparent shadow-md'
                   : 'bg-slate-50 dark:bg-slate-800/70 text-slate-800 dark:text-slate-200 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100 dark:hover:bg-slate-800'"
               >
-                <div class="flex items-center gap-2.5">
-                  <img v-if="cat.image" :src="cat.image" :alt="cat.name[lang]" class="w-7 h-7 rounded-xl object-cover bg-white/90 shrink-0" />
-                  <component v-else :is="getCategoryIcon(cat.icon)" class="w-5 h-5 shrink-0" />
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-2xl overflow-hidden bg-white dark:bg-slate-900 p-0.5 shadow-[0_6px_14px_-3px_rgba(15,23,42,0.25),inset_0_1px_3px_rgba(255,255,255,0.8)] shrink-0">
+                    <img v-if="cat.image" :src="cat.image" :alt="cat.name[lang]" class="w-full h-full rounded-[13px] object-cover" />
+                    <div v-else class="w-full h-full flex items-center justify-center text-brand-500">
+                      <component :is="getCategoryIcon(cat.icon)" class="w-6 h-6" />
+                    </div>
+                  </div>
                   <span>{{ cat.name[lang] }}</span>
                 </div>
                 <span v-if="activeCategory === cat.slug">✓</span>
