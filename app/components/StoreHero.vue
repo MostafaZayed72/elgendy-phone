@@ -63,7 +63,7 @@ onUnmounted(() => {
     :class="slides.length > 0 ? 'bg-slate-950' : 'bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-950'"
     data-aos="fade-down"
   >
-    <!-- Full-bleed background carousel (switches every 3 seconds) -->
+    <!-- Full-bleed background carousel (switches every 3.5 seconds, natural colors without shading) -->
     <div v-if="slides.length > 0" class="absolute inset-0 z-0 pointer-events-none select-none">
       <div
         v-for="(product, idx) in slides"
@@ -79,9 +79,6 @@ onUnmounted(() => {
           decoding="async"
         />
       </div>
-
-      <!-- Gradient overlay for crisp text readability -->
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-950/45 to-slate-950/75" />
     </div>
 
     <!-- Centered Store Title, Tagline, Active Product Pill & Dots -->

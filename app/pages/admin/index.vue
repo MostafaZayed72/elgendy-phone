@@ -22,13 +22,22 @@ const loadingStore = ref(false)
 const seeding = ref(false)
 const savingSettings = ref(false)
 
+const DEFAULT_SETTINGS = {
+  heroBadgeAr: 'كتالوج المنتجات الرسمي',
+  heroBadgeEn: 'Official Product Catalog',
+  heroTitleAr: 'EL-GENDY Mobile Store',
+  heroTitleEn: 'EL-GENDY Mobile Store',
+  heroTaglineAr: 'خبرة تمتد منذ عام 1999 في عالم الهواتف الذكية والإكسسوارات الأصلية — أحدث الأجهزة، الشواحن السريعة، السماعات، والضمان الحقيقي.',
+  heroTaglineEn: 'Trusted since 1999 in smartphones & genuine accessories — latest devices, fast chargers, earbuds, and real warranty.'
+}
+
 const formSettings = reactive({
-  heroBadgeAr: '',
-  heroBadgeEn: '',
-  heroTitleAr: '',
-  heroTitleEn: '',
-  heroTaglineAr: '',
-  heroTaglineEn: '',
+  heroBadgeAr: DEFAULT_SETTINGS.heroBadgeAr,
+  heroBadgeEn: DEFAULT_SETTINGS.heroBadgeEn,
+  heroTitleAr: DEFAULT_SETTINGS.heroTitleAr,
+  heroTitleEn: DEFAULT_SETTINGS.heroTitleEn,
+  heroTaglineAr: DEFAULT_SETTINGS.heroTaglineAr,
+  heroTaglineEn: DEFAULT_SETTINGS.heroTaglineEn,
   promoBannerImage: '',
   promoBannerEnabled: false,
   promoBannerLink: ''
@@ -104,12 +113,12 @@ const loadDashboard = async () => {
       heroSettings.heroTagline.en = res.settings.heroTagline?.en || heroSettings.heroTagline.en
     }
     if (res.settings) {
-      formSettings.heroBadgeAr = res.settings.heroBadge?.ar || ''
-      formSettings.heroBadgeEn = res.settings.heroBadge?.en || ''
-      formSettings.heroTitleAr = res.settings.heroTitle?.ar || ''
-      formSettings.heroTitleEn = res.settings.heroTitle?.en || ''
-      formSettings.heroTaglineAr = res.settings.heroTagline?.ar || ''
-      formSettings.heroTaglineEn = res.settings.heroTagline?.en || ''
+      formSettings.heroBadgeAr = res.settings.heroBadge?.ar || DEFAULT_SETTINGS.heroBadgeAr
+      formSettings.heroBadgeEn = res.settings.heroBadge?.en || DEFAULT_SETTINGS.heroBadgeEn
+      formSettings.heroTitleAr = res.settings.heroTitle?.ar || DEFAULT_SETTINGS.heroTitleAr
+      formSettings.heroTitleEn = res.settings.heroTitle?.en || DEFAULT_SETTINGS.heroTitleEn
+      formSettings.heroTaglineAr = res.settings.heroTagline?.ar || DEFAULT_SETTINGS.heroTaglineAr
+      formSettings.heroTaglineEn = res.settings.heroTagline?.en || DEFAULT_SETTINGS.heroTaglineEn
       formSettings.promoBannerImage = res.settings.promoBannerImage || ''
       formSettings.promoBannerEnabled = Boolean(res.settings.promoBannerEnabled)
       formSettings.promoBannerLink = res.settings.promoBannerLink || ''
